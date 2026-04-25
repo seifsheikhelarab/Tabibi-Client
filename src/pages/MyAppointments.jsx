@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
 import { assets } from "../assets/assets";
-import { appointmentsApi, ratingsApi } from "../api/client";
+import { appointmentsApi, ratingsApi, uploadApi } from "../api/client";
 
 const statusColorMap = {
     PENDING: "text-yellow-600 border-yellow-500",

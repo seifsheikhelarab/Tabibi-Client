@@ -18,10 +18,10 @@ const AppContextProvider = (props) => {
     const getDoctosData = useCallback(async (filters = {}) => {
         try {
             const result = await doctorsApi.list(filters)
-            if (result?.data && Array.isArray(result.data)) {
-                setDoctors(result.data)
-            } else if (Array.isArray(result)) {
-                setDoctors(result)
+            // Use result.data because extractData returns { data: ... }
+            const doctorsList = result?.data ?? result
+            if (Array.isArray(doctorsList)) {
+                setDoctors(doctorsList)
             } else {
                 setDoctors([])
             }
@@ -37,12 +37,11 @@ const AppContextProvider = (props) => {
         try {
             const organizationId = session?.activeOrganizationId || session?.user?.organizationId
             const result = await patientsApi.getByUserId(session.user.id, organizationId)
-            if (result?.data && Array.isArray(result.data) && result.data[0]) {
-                setPatientData(result.data[0])
-            } else if (result?.data?.id) {
-                setPatientData(result.data)
-            } else if (result?.id) {
-                setPatientData(result)
+            const data = result?.data ?? result
+            if (Array.isArray(data) && data[0]) {
+                setPatientData(data[0])
+            } else if (data?.id) {
+                setPatientData(data)
             }
         } catch (error) {
             console.log(error)
@@ -74,10 +73,9 @@ const AppContextProvider = (props) => {
 
         try {
             const result = await appointmentsApi.list({ patientId: patientData.id })
-            if (result?.data && Array.isArray(result.data)) {
-                setPatientAppointments(result.data)
-            } else if (Array.isArray(result)) {
-                setPatientAppointments(result)
+            const appointments = result?.data ?? result
+            if (Array.isArray(appointments)) {
+                setPatientAppointments(appointments)
             } else {
                 setPatientAppointments([])
             }

@@ -111,10 +111,11 @@ const Appointment = () => {
         }
 
         try {
-            const [hours, minutes] = selectedSlot.slotTime.split(':')
-            const startTime = `${hours}:${minutes}`
-            const endDate = new Date(selectedSlot.datetime.getTime() + 30 * 60000)
-            const endTime = `${String(endDate.getHours()).padStart(2, '0')}:${String(endDate.getMinutes()).padStart(2, '0')}`
+            const timeMatch = selectedSlot.datetime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }).match(/(\d{2}):(\d{2})/);
+            const startTime = timeMatch ? `${timeMatch[1]}:${timeMatch[2]}` : selectedSlot.time.split(' ')[0];
+            const endDate = new Date(selectedSlot.datetime.getTime() + 30 * 60000);
+            const endTimeMatch = endDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }).match(/(\d{2}):(\d{2})/);
+            const endTime = endTimeMatch ? `${endTimeMatch[1]}:${endTimeMatch[2]}` : '00:00';
 
             await appointmentsApi.create({
                 doctorId: docId,

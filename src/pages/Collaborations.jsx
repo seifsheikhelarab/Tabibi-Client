@@ -25,12 +25,16 @@ const Collaborations = () => {
     const load = async () => {
       try {
         const [pharmacyRes, labRes] = await Promise.all([
-          axios.get(`${backendUrl}/api/collaborations/pharmacies`),
-          axios.get(`${backendUrl}/api/collaborations/labs`),
+          axios.get(`${backendUrl}/api/pharmacies`),
+          axios.get(`${backendUrl}/api/labs`),
         ]);
 
-        setPharmacies(pharmacyRes.data?.pharmacies || []);
-        setLabs(labRes.data?.labs || []);
+        // Handle standardized response structure { success: true, data: { pharmacies: [] } }
+        const pharmacyData = pharmacyRes.data?.data;
+        const labData = labRes.data?.data;
+
+        setPharmacies(pharmacyData?.pharmacies || pharmacyData?.data || []);
+        setLabs(labData?.labs || labData?.data || []);
       } catch (error) {
         toast.error("Failed to load collaborations");
       } finally {
@@ -64,10 +68,9 @@ const Collaborations = () => {
               {pharmacies.length > 0 ? (
                 pharmacies.map((item) => (
                   <Card
-                    key={item._id}
+                    key={item.id || item._id}
                     title={item.name}
                     city={item.city}
-                    area={item.area}
                     address={item.address}
                     phone={item.phone}
                     email={item.email}
@@ -88,10 +91,9 @@ const Collaborations = () => {
               {labs.length > 0 ? (
                 labs.map((item) => (
                   <Card
-                    key={item._id}
+                    key={item.id || item._id}
                     title={item.name}
                     city={item.city}
-                    area={item.area}
                     address={item.address}
                     phone={item.phone}
                     email={item.email}

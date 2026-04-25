@@ -20,6 +20,13 @@ api.interceptors.request.use(async (config) => {
     if (sessionData?.session?.token) {
         config.headers.Authorization = `Bearer ${sessionData.session.token}`
     }
+    
+    // Better Auth uses x-organization-id for multi-tenancy plugins
+    const organizationId = sessionData?.session?.activeOrganizationId || sessionData?.user?.organizationId
+    if (organizationId) {
+        config.headers['x-organization-id'] = organizationId
+    }
+    
     return config
 })
 
@@ -38,11 +45,8 @@ api.interceptors.response.use(
 
 const extractData = (response) => {
     const data = response.data
-    if (data?.success !== undefined) {
-        return data
-    }
-    if (data?.data && data?.pagination) {
-        return data
+    if (data?.success && data?.data !== undefined) {
+        return { data: data.data, success: true, message: data.message, pagination: data.pagination }
     }
     return data
 }
@@ -98,11 +102,6 @@ export const ratingsApi = {
     create: (data) => api.post('/api/ratings', data).then(extractData),
     getDoctorReviews: (doctorId, params = {}) => api.get(`/api/ratings/doctor/${doctorId}`, { params }).then(extractData),
     getDoctorStats: (doctorId) => api.get(`/api/ratings/doctor/${doctorId}/stats`).then(extractData)
-}
-
-export const paymentsApi = {
-    createIntent: (data) => api.post('/api/payments/create-intent', data).then(extractData),
-    verify: (data) => api.post('/api/payments/verify', data).then(extractData)
 }
 
 export const chatbotApi = {
