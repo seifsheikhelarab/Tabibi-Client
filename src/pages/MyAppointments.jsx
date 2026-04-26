@@ -5,21 +5,21 @@ import { assets } from "../assets/assets";
 import { appointmentsApi, ratingsApi, uploadApi } from "../api/client";
 
 const statusColorMap = {
-    PENDING: "text-yellow-600 border-yellow-500",
-    CONFIRMED: "text-blue-600 border-blue-500",
-    COMPLETED: "text-green-600 border-green-500",
-    CANCELLED: "text-red-600 border-red-500",
+    PENDING: "bg-yellow-50 text-yellow-700 border-yellow-300",
+    CONFIRMED: "bg-blue-50 text-blue-700 border-blue-300",
+    COMPLETED: "bg-green-50 text-green-700 border-green-300",
+    CANCELLED: "bg-red-50 text-red-700 border-red-300",
 };
 
 const paymentStatusColorMap = {
-    PENDING: "text-yellow-600 border-yellow-500",
-    VERIFYING: "text-orange-600 border-orange-500",
-    PAID: "text-green-600 border-green-500",
-    FAILED: "text-red-600 border-red-500",
+    PENDING: "bg-yellow-50 text-yellow-700 border-yellow-300",
+    VERIFYING: "bg-orange-50 text-orange-700 border-orange-300",
+    PAID: "bg-green-50 text-green-700 border-green-300",
+    FAILED: "bg-red-50 text-red-700 border-red-300",
 };
 
 const MyAppointments = () => {
-    const { patientAppointments, setPatientAppointments, loadPatientAppointments, getDoctosData } = useContext(AppContext);
+    const { patientAppointments, loadPatientAppointments } = useContext(AppContext);
     const [payment, setPayment] = useState("");
     const [uploading, setUploading] = useState(false);
 
@@ -95,112 +95,119 @@ const MyAppointments = () => {
     }, [loadPatientAppointments])
 
     return (
-        <div>
-            <p className="pb-3 mt-12 text-lg font-medium text-gray-600 border-b">My appointments</p>
-            <div>
-                {patientAppointments
-                    .sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate))
-                    .map((item) => {
-                        const doctorName = item.doctor 
-                            ? `${item.doctor.firstName} ${item.doctor.lastName}`.trim()
-                            : 'Doctor'
-                        
-                        return (
-                            <div key={item.id} className="grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-4 border-b">
-                                <div>
-                                    <img className="w-36 bg-[#EAEFFF]" src={item.doctor?.image || assets.doc_img} alt={doctorName} />
-                                </div>
-                                <div className="flex-1 text-sm text-[#5E5E5E]">
-                                    <p className="text-[#262626] text-base font-semibold">{doctorName}</p>
-                                    <p>{item.doctor?.specialization || 'General'}</p>
-                                    <p className="mt-1">
-                                        <span className="text-sm text-[#3C3C3C] font-medium">Date & Time:</span> {formatDate(item.appointmentDate)} | {item.startTime || 'N/A'}
-                                    </p>
-                                    <p className={`inline-block mt-2 text-xs border rounded px-2 py-1 ${statusColorMap[item.status] || "text-gray-600 border-gray-400"}`}>
-                                        {item.status || "PENDING"}
-                                    </p>
-                                    {item.paymentStatus && (
-                                        <p className={`inline-block mt-2 ml-2 text-xs border rounded px-2 py-1 ${paymentStatusColorMap[item.paymentStatus] || "text-gray-600 border-gray-400"}`}>
-                                            Payment: {item.paymentStatus}
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="flex flex-col gap-2 justify-end text-sm text-center">
-                                    {item.status !== 'CANCELLED' && item.status !== 'COMPLETED' && item.paymentStatus === 'PENDING' && payment !== item.id && (
-                                        <button onClick={() => setPayment(item.id)} className="text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300">
-                                            Pay Online
-                                        </button>
-                                    )}
+        <div className="max-w-3xl mx-auto pb-20 animate-fade-in-up">
+            <h1 className="text-2xl font-semibold text-gray-800 mt-10 mb-6">My Appointments</h1>
+            
+            {patientAppointments.length === 0 ? (
+                <div className="text-center py-20 bg-gray-50 rounded-2xl">
+                    <p className="text-gray-500">No appointments found.</p>
+                </div>
+            ) : (
+                <div className="space-y-4">
+                    {patientAppointments
+                        .sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate))
+                        .map((item) => {
+                            const doctorName = item.doctor 
+                                ? `${item.doctor.firstName} ${item.doctor.lastName}`.trim()
+                                : 'Doctor'
+                            
+                            return (
+                                <div key={item.id} className="bg-white rounded-2xl p-5 shadow-sm">
+                                    <div className="flex flex-col sm:flex-row gap-4">
+                                        <div className="flex-shrink-0">
+                                            <img className="w-24 h-24 rounded-xl object-cover bg-primary/5" src={item.doctor?.image || assets.doc_img} alt={doctorName} />
+                                        </div>
+                                        
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <h3 className="text-lg font-semibold text-gray-800">{doctorName}</h3>
+                                                    <p className="text-gray-500 text-sm">{item.doctor?.specialization || 'General'}</p>
+                                                    <p className="text-gray-500 text-sm mt-1">
+                                                        {formatDate(item.appointmentDate)} at {item.startTime || 'N/A'}
+                                                    </p>
+                                                </div>
+                                                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${statusColorMap[item.status] || "bg-gray-50 text-gray-600 border-gray-300"}`}>
+                                                    {item.status || "PENDING"}
+                                                </span>
+                                            </div>
 
-                                    {item.status !== 'CANCELLED' && item.status !== 'COMPLETED' && item.paymentStatus === 'PENDING' && payment === item.id && (
-                                        <div className="flex flex-col items-center gap-2">
-                                            <p className="text-xs text-gray-500 text-center max-w-[220px]">Upload Instapay proof to mark this appointment as paid.</p>
-                                            <div className="relative">
-                                                <input disabled={uploading} onChange={(e) => appointmentInstapay(item.id, e.target.files[0])} type="file" id={`proof-${item.id}`} hidden accept="image/*" />
-                                                <label htmlFor={`proof-${item.id}`} className={`cursor-pointer text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-gray-100 transition-all duration-300 flex items-center justify-center ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                                                    <img className="max-w-28 max-h-12 object-contain" src={assets.instapay_logo} alt="Instapay" />
-                                                </label>
+                                            {item.paymentStatus && (
+                                                <span className={`inline-block mt-2 mr-2 px-3 py-1 rounded-full text-xs font-medium border ${paymentStatusColorMap[item.paymentStatus] || "bg-gray-50 text-gray-600 border-gray-300"}`}>
+                                                    Payment: {item.paymentStatus}
+                                                </span>
+                                            )}
+
+                                            {/* Actions */}
+                                            <div className="flex flex-wrap gap-2 mt-4">
+                                                {item.status !== 'CANCELLED' && item.status !== 'COMPLETED' && item.paymentStatus === 'PENDING' && payment !== item.id && (
+                                                    <button onClick={() => setPayment(item.id)} className="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:border-primary hover:text-primary transition-colors">
+                                                        Pay Online
+                                                    </button>
+                                                )}
+
+                                                {item.status !== 'CANCELLED' && item.status !== 'COMPLETED' && item.paymentStatus === 'PENDING' && payment === item.id && (
+                                                    <>
+                                                        <div className="w-full">
+                                                            <p className="text-xs text-gray-500 mb-2">Upload Instapay proof to mark this appointment as paid.</p>
+                                                        </div>
+                                                        <div className="relative">
+                                                            <input disabled={uploading} onChange={(e) => appointmentInstapay(item.id, e.target.files[0])} type="file" id={`proof-${item.id}`} hidden accept="image/*" />
+                                                            <label htmlFor={`proof-${item.id}`} className={`cursor-pointer px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50 transition-colors flex items-center ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                                                <img className="max-w-20 max-h-8 object-contain" src={assets.instapay_logo} alt="Instapay" />
+                                                            </label>
+                                                        </div>
+                                                        <button onClick={() => appointmentCash(item.id)} className="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:border-primary hover:text-primary transition-colors">
+                                                            Cash
+                                                        </button>
+                                                    </>
+                                                )}
+
+                                                {item.paymentStatus === 'VERIFYING' && (
+                                                    <button className="px-4 py-2 border border-orange-300 rounded-lg text-sm text-orange-700 bg-orange-50">Verifying Payment...</button>
+                                                )}
+
+                                                {item.paymentStatus === 'PAID' && item.status !== 'COMPLETED' && (
+                                                    <button className="px-4 py-2 border border-green-300 rounded-lg text-sm text-green-700 bg-green-50">Paid</button>
+                                                )}
+
+                                                {item.status === 'COMPLETED' && !item.rating && (
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs text-gray-500">Rate:</span>
+                                                        <div className="flex gap-1">
+                                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                                <button
+                                                                    key={star}
+                                                                    onClick={() => rateDoctor(item.id, item.doctorId, star)}
+                                                                    className="w-6 h-6 flex items-center justify-center text-yellow-500 hover:scale-110 transition-transform"
+                                                                >
+                                                                    ★
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {item.status === 'COMPLETED' && item.rating && (
+                                                    <span className="px-4 py-2 border border-green-300 rounded-lg text-sm text-green-700 bg-green-50">Completed</span>
+                                                )}
+
+                                                {item.status !== 'CANCELLED' && item.status !== 'COMPLETED' && (
+                                                    <button onClick={() => cancelAppointment(item.id)} className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-500 hover:border-red-300 hover:text-red-500 transition-colors">
+                                                        Cancel
+                                                    </button>
+                                                )}
+                                                {item.status === 'CANCELLED' && (
+                                                    <span className="px-4 py-2 border border-red-300 rounded-lg text-sm text-red-700 bg-red-50">Cancelled</span>
+                                                )}
                                             </div>
                                         </div>
-                                    )}
-
-                                    {item.status !== 'CANCELLED' && item.status !== 'COMPLETED' && item.paymentStatus === 'PENDING' && payment === item.id && (
-                                        <button onClick={() => appointmentCash(item.id)} className="text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300 flex items-center justify-center font-medium">
-                                            Cash
-                                        </button>
-                                    )}
-
-                                    {item.paymentStatus === 'VERIFYING' && (
-                                        <button className="sm:min-w-48 py-2 border rounded text-orange-600 bg-orange-50 border-orange-200">Verifying Payment...</button>
-                                    )}
-
-                                    {item.paymentStatus === 'PAID' && item.status !== 'COMPLETED' && (
-                                        <button className="sm:min-w-48 py-2 border rounded text-green-600 bg-green-50 border-green-200">Paid</button>
-                                    )}
-
-                                    {item.status === 'COMPLETED' && !item.rating && (
-                                        <div className="flex flex-col gap-1 items-center sm:min-w-48">
-                                            <p className="text-xs text-gray-500">Rate your experience:</p>
-                                            <div className="flex gap-1">
-                                                {[1, 2, 3, 4, 5].map((star) => (
-                                                    <img
-                                                        key={star}
-                                                        onClick={() => rateDoctor(item.id, item.doctorId, star)}
-                                                        className="w-5 cursor-pointer hover:scale-110 transition-all"
-                                                        src={assets.verified_icon}
-                                                        alt={`Rate ${star}`}
-                                                        title={`Rate ${star} stars`}
-                                                    />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {item.status === 'COMPLETED' && item.rating && (
-                                        <button className="sm:min-w-48 py-2 border border-green-500 rounded text-green-500">Rating Submitted</button>
-                                    )}
-                                    {item.status === 'COMPLETED' && (
-                                        <button className="sm:min-w-48 py-2 border border-green-500 rounded text-green-500">Completed</button>
-                                    )}
-
-                                    {item.status !== 'CANCELLED' && item.status !== 'COMPLETED' && (
-                                        <button onClick={() => cancelAppointment(item.id)} className="text-[#696969] sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all duration-300">
-                                            Cancel appointment
-                                        </button>
-                                    )}
-                                    {item.status === 'CANCELLED' && (
-                                        <button className="sm:min-w-48 py-2 border border-red-500 rounded text-red-500">Appointment cancelled</button>
-                                    )}
+                                    </div>
                                 </div>
-                            </div>
-                        )
-                    })}
-                {patientAppointments.length === 0 && (
-                    <div className="py-20 text-center">
-                        <p className="text-gray-500">No appointments found.</p>
-                    </div>
-                )}
-            </div>
+                            )
+                        })}
+                </div>
+            )}
         </div>
     );
 };

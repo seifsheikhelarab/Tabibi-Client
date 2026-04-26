@@ -16,7 +16,18 @@ const api = axios.create({
 })
 
 api.interceptors.request.use(async (config) => {
-    const { data: sessionData } = await authClient.getSession()
+    // Only attempt to get session if we're not already in the middle of an auth call
+    // or if the request is for a protected resource
+    const isPublicRoute = config.url === '/api/doctors' || config.url.startsWith('/api/doctors/') || config.url.startsWith('/api/ratings/doctor/')
+    
+    let sessionData = null
+    try {
+        const { data } = await authClient.getSession()
+        sessionData = data
+    } catch (e) {
+        // Ignore session fetch errors for public routes
+    }
+
     if (sessionData?.session?.token) {
         config.headers.Authorization = `Bearer ${sessionData.session.token}`
     }
@@ -33,7 +44,9 @@ api.interceptors.request.use(async (config) => {
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
+        const isPublicRoute = error.config?.url === '/api/doctors' || error.config?.url.startsWith('/api/doctors/')
+        
+        if (error.response?.status === 401 && !isPublicRoute) {
             authClient.signOut()
             if (navigate) {
                 navigate('/login')
@@ -45,8 +58,25 @@ api.interceptors.response.use(
 
 const extractData = (response) => {
     const data = response.data
-    if (data?.success && data?.data !== undefined) {
-        return { data: data.data, success: true, message: data.message, pagination: data.pagination }
+    // Handle Tabibi-Server { success, data, pagination } or { success, data: T }
+    if (data?.success) {
+        // If it's a standard paginated response, return it as is
+        if (data.data !== undefined && data.pagination !== undefined) {
+            return { data: data.data, pagination: data.pagination, success: true }
+        }
+        // If it has data but no specific key, return the inner data
+        if (data.data !== undefined) {
+            return { data: data.data, success: true, message: data.message }
+        }
+        
+        // Legacy/Fallback keys for backend-v1 compatibility
+        if (data.doctors !== undefined) return { data: data.doctors, success: true }
+        if (data.appointments !== undefined) return { data: data.appointments, success: true }
+        if (data.profileData !== undefined) return { data: data.profileData, success: true }
+        
+        // If data was spread into success object (fallback for raw objects)
+        const { success, message, ...rest } = data
+        return { data: rest, success: true, message }
     }
     return data
 }

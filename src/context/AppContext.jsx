@@ -17,8 +17,8 @@ const AppContextProvider = (props) => {
 
     const getDoctosData = useCallback(async (filters = {}) => {
         try {
-            const result = await doctorsApi.list(filters)
-            // Use result.data because extractData returns { data: ... }
+            const result = await doctorsApi.list({ ...filters, allowPublic: true })
+            // Tabibi-Server returns { data: [...] } for list
             const doctorsList = result?.data ?? result
             if (Array.isArray(doctorsList)) {
                 setDoctors(doctorsList)
@@ -27,7 +27,7 @@ const AppContextProvider = (props) => {
             }
         } catch (error) {
             console.log(error)
-            toast.error(error.message)
+            setDoctors([])
         }
     }, [])
 
@@ -72,10 +72,10 @@ const AppContextProvider = (props) => {
         if (!patientData?.id) return
 
         try {
-            const result = await appointmentsApi.list({ patientId: patientData.id })
+            const result = await appointmentsApi.list({})
             const appointments = result?.data ?? result
             if (Array.isArray(appointments)) {
-                setPatientAppointments(appointments)
+                setPatientAppointments(appointments.filter(apt => apt.patient?.id === patientData.id || apt.patientId === patientData.id))
             } else {
                 setPatientAppointments([])
             }
@@ -129,12 +129,12 @@ const AppContextProvider = (props) => {
     }, [getDoctosData])
 
     useEffect(() => {
-        if (!isPending) {
+        if (!isPending && session?.user?.id) {
             loadPatientData().then(() => {
                 loadUserProfileData()
             })
         }
-    }, [isPending])
+    }, [isPending, session?.user?.id, loadPatientData, loadUserProfileData])
 
     useEffect(() => {
         if (patientData?.id) {
