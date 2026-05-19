@@ -9,6 +9,7 @@ import Contact from './pages/Contact'
 import Appointment from './pages/Appointment'
 import MyAppointments from './pages/MyAppointments'
 import MyProfile from './pages/MyProfile'
+import SpecialistFinder from './pages/SpecialistFinder'
 import Footer from './components/Footer'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -25,28 +26,31 @@ const App = () => {
     setNavigate(navigate)
   }, [navigate])
   return (
-    <div className='mx-4 sm:mx-[10%]'>
+    <div className='min-h-screen bg-surface text-text'>
       <ToastContainer />
       <Navbar />
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/doctors' element={<Doctors />} />
-        <Route path='/doctors/:speciality' element={<Doctors />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/about' element={<About />} />
-        <Route path='/contact' element={<Contact />} />
-        <Route path='/collaborations' element={<Collaborations />} />
-        <Route path='/verify' element={<Verify />} />
-        <Route path='/appointment/:docId' element={
-          <ProtectedRoute><Appointment /></ProtectedRoute>
-        } />
-        <Route path='/my-appointments' element={
-          <ProtectedRoute><MyAppointments /></ProtectedRoute>
-        } />
-        <Route path='/my-profile' element={
-          <ProtectedRoute><MyProfile /></ProtectedRoute>
-        } />
-      </Routes>
+      <main className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path='/doctors' element={<Doctors />} />
+          <Route path='/doctors/:speciality' element={<Doctors />} />
+          <Route path='/find-specialist' element={<SpecialistFinder />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/about' element={<About />} />
+          <Route path='/contact' element={<Contact />} />
+          <Route path='/collaborations' element={<Collaborations />} />
+          <Route path='/verify' element={<Verify />} />
+          <Route path='/appointment/:docId' element={
+            <ProtectedRoute><Appointment /></ProtectedRoute>
+          } />
+          <Route path='/my-appointments' element={
+            <ProtectedRoute><MyAppointments /></ProtectedRoute>
+          } />
+          <Route path='/my-profile' element={
+            <ProtectedRoute><MyProfile /></ProtectedRoute>
+          } />
+        </Routes>
+      </main>
       <Footer />
       <Chatbot />
     </div>

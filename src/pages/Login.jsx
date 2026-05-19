@@ -112,30 +112,30 @@ const Login = () => {
   }
 
   return (
-    <div className='min-h-[85vh] flex items-center justify-center py-12 px-4'>
+    <div className='min-h-[80vh] flex items-center justify-center py-12 px-4'>
       <div className='w-full max-w-md'>
-        <div className='bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-primary/5 p-8 sm:p-10 border border-primary/5'>
+        <div className='bg-white rounded-2xl shadow-sm border border-border-light p-8 sm:p-10'>
           <div className='text-center mb-8'>
-            <h1 className='text-2xl sm:text-3xl font-semibold text-gray-800 mb-2'>
+            <h1 className='text-2xl sm:text-3xl font-display font-bold text-text mb-1.5'>
               {state === 'Sign Up' ? 'Create Account' : 'Welcome Back'}
             </h1>
-            <p className='text-gray-500 text-sm'>
+            <p className='text-text-secondary text-sm'>
               {state === 'Sign Up' 
                 ? 'Sign up to book your appointments' 
                 : 'Sign in to continue to your appointments'}
             </p>
           </div>
 
-          <form onSubmit={onSubmitHandler} className='space-y-5'>
+          <form onSubmit={onSubmitHandler} className='space-y-4'>
             {state === 'Sign Up' && (
               <div>
-                <label className='block text-sm font-medium text-gray-700 mb-1.5'>
+                <label className='block text-sm font-medium text-text mb-1'>
                   Full Name
                 </label>
                 <input
                   onChange={(e) => setName(e.target.value)}
                   value={name}
-                  className='w-full px-4 py-3 rounded-lg border border-gray-200 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200'
+                  className='w-full px-4 py-2.5 rounded-xl border border-border text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all duration-200'
                   type="text"
                   required
                   placeholder="Enter your full name"
@@ -145,17 +145,17 @@ const Login = () => {
             )}
 
             <div>
-              <label className='block text-sm font-medium text-gray-700 mb-1.5'>
+              <label className='block text-sm font-medium text-text mb-1'>
                 Email
               </label>
               <input
                 onChange={(e) => setEmail(e.target.value)}
                 onBlur={() => handleBlur('email')}
                 value={email}
-                className={`w-full px-4 py-3 rounded-lg border text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
+                className={`w-full px-4 py-2.5 rounded-xl border text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all duration-200 ${
                   errors.email 
-                    ? 'border-red-300 focus:border-red-400' 
-                    : 'border-gray-200 focus:border-primary'
+                    ? 'border-rose focus:border-rose' 
+                    : 'border-border focus:border-primary'
                 }`}
                 type="email"
                 required
@@ -163,22 +163,22 @@ const Login = () => {
                 disabled={isLoading}
               />
               {errors.email && (
-                <p className='text-red-500 text-xs mt-1.5'>{errors.email}</p>
+                <p className='text-rose text-xs mt-1 font-medium'>{errors.email}</p>
               )}
             </div>
 
             <div>
-              <label className='block text-sm font-medium text-gray-700 mb-1.5'>
+              <label className='block text-sm font-medium text-text mb-1'>
                 Password
               </label>
               <input
                 onChange={(e) => setPassword(e.target.value)}
                 onBlur={() => handleBlur('password')}
                 value={password}
-                className={`w-full px-4 py-3 rounded-lg border text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 ${
+                className={`w-full px-4 py-2.5 rounded-xl border text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all duration-200 ${
                   errors.password 
-                    ? 'border-red-300 focus:border-red-400' 
-                    : 'border-gray-200 focus:border-primary'
+                    ? 'border-rose focus:border-rose' 
+                    : 'border-border focus:border-primary'
                 }`}
                 type="password"
                 required
@@ -186,14 +186,14 @@ const Login = () => {
                 disabled={isLoading}
               />
               {errors.password && (
-                <p className='text-red-500 text-xs mt-1.5'>{errors.password}</p>
+                <p className='text-rose text-xs mt-1 font-medium'>{errors.password}</p>
               )}
             </div>
 
             <button 
-              className='w-full py-3.5 mt-2 rounded-lg bg-primary text-white font-medium text-sm 
+              className='w-full py-3 mt-1 rounded-xl bg-primary text-white font-semibold text-sm 
                 disabled:opacity-50 disabled:cursor-not-allowed 
-                hover:opacity-90 active:scale-[0.99] transition-all duration-200'
+                hover:opacity-90 active:scale-[0.98] transition-all duration-200'
               disabled={isLoading}
             >
               {isLoading ? (
@@ -210,29 +210,29 @@ const Login = () => {
             </button>
           </form>
 
-          <div className='mt-6 pt-6 border-t border-gray-100 text-center'>
+          <div className='mt-6 pt-6 border-t border-border-light text-center'>
             {state === 'Sign Up' ? (
-              <p className='text-sm text-gray-500'>
+              <p className='text-sm text-text-secondary'>
                 Already have an account?{' '}
                 <button 
                   onClick={() => {
                     setState('Login')
                     setErrors({})
                   }}
-                  className='text-primary font-medium hover:underline'
+                  className='text-primary font-semibold hover:underline'
                 >
                   Sign in
                 </button>
               </p>
             ) : (
-              <p className='text-sm text-gray-500'>
+              <p className='text-sm text-text-secondary'>
                 Don't have an account?{' '}
                 <button 
                   onClick={() => {
                     setState('Sign Up')
                     setErrors({})
                   }}
-                  className='text-primary font-medium hover:underline'
+                  className='text-primary font-semibold hover:underline'
                 >
                   Create one
                 </button>

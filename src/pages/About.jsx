@@ -1,91 +1,160 @@
-import React from 'react'
+import React, { useRef, useEffect } from 'react'
 import { assets } from '../assets/assets'
 
-const About = () => {
-  return (
-    <div className="pb-20 animate-fade-in-up">
+const AboutCalmCanvas = () => {
+    const canvasRef = useRef(null);
 
-      {/* Header Section */}
-      <div className='text-center pt-20 pb-16 px-4'>
-        <h1 className='text-3xl md:text-5xl font-semibold text-gray-800'>
-          Transforming Healthcare Access
-        </h1>
-        <p className='mt-4 text-gray-500 max-w-2xl mx-auto'>
-          Discover the story behind Tabibi and our commitment to making high-quality medical care accessible to everyone, everywhere.
-        </p>
-      </div>
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let animationFrameId;
+        let width = canvas.width = canvas.offsetWidth;
+        let height = canvas.height = canvas.offsetHeight;
 
-      {/* Main Content Section */}
-      <div className='flex flex-col lg:flex-row items-center gap-12 lg:gap-20 py-12 px-6 max-w-7xl mx-auto'>
-        <div className='relative'>
-          <img
-            className='w-full lg:max-w-md rounded-3xl shadow-xl'
-            src={assets.about_image}
-            alt="About Tabibi"
-          />
-        </div>
+        const handleResize = () => {
+            if (!canvas) return;
+            width = canvas.width = canvas.offsetWidth;
+            height = canvas.height = canvas.offsetHeight;
+        };
+        window.addEventListener('resize', handleResize);
 
-        <div className='flex flex-col gap-8 flex-1'>
-          <div className='space-y-6 text-gray-600 leading-relaxed'>
-            <p>
-              Welcome to <span className='text-primary font-medium'>Tabibi</span>, your trusted partner in managing your healthcare needs conveniently and efficiently. At Tabibi, we understand the challenges individuals face when it comes to scheduling doctor appointments and managing their health records.
-            </p>
-            <p>
-              Tabibi is committed to excellence in healthcare technology. We continuously strive to enhance our platform, integrating the latest advancements to improve user experience and deliver superior service.
-            </p>
-          </div>
+        let phase = 0;
+        const draw = () => {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, width, height);
 
-          <div className='bg-white p-8 rounded-2xl shadow-sm relative overflow-hidden'>
-            <div className='absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16'></div>
-            <h3 className='text-xl font-semibold text-gray-800 mb-4'>
-              Our Vision
-            </h3>
-            <p className='text-gray-500 relative z-10 italic'>
-              "Our vision at Tabibi is to create a seamless healthcare experience for every user. We aim to bridge the gap between patients and healthcare providers, making it easier for you to access the care you need, when you need it."
-            </p>
-          </div>
-        </div>
-      </div>
+            const time = Date.now() * 0.0005;
+            const breathe = Math.sin(time) * 0.5 + 0.5;
 
-      {/* Why Choose Us Section */}
-      <div className='mt-24 px-6 max-w-7xl mx-auto'>
-        <div className='mb-10'>
-          <h2 className='text-2xl font-semibold text-gray-800 mb-2'>Why Choose Us</h2>
-          <div className='h-px w-16 bg-primary'></div>
-        </div>
-
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-          {[
-            {
-              title: "Efficiency",
-              desc: "Streamlined appointment scheduling that fits into your busy lifestyle.",
-              tag: "Time-saving"
-            },
-            {
-              title: "Convenience",
-              desc: "Access to a network of trusted healthcare professionals in your area.",
-              tag: "Easy Access"
-            },
-            {
-              title: "Personalization",
-              desc: "Tailored recommendations and reminders to help you stay on top of your health.",
-              tag: "Core Focus"
+            ctx.beginPath();
+            ctx.fillStyle = 'rgba(95, 111, 255, 0.015)';
+            ctx.moveTo(0, height);
+            for (let x = 0; x <= width; x += 6) {
+                const y = height * 0.5 + 
+                          Math.sin(x * 0.005 + phase) * (20 + breathe * 25) + 
+                          Math.cos(x * 0.002 - phase) * (10 + breathe * 15);
+                ctx.lineTo(x, y);
             }
-          ].map((item, index) => (
-            <div
-              key={index}
-              className='bg-white p-8 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 group'
-            >
-              <span className='text-xs font-medium text-primary mb-3 block'>{item.tag}</span>
-              <h4 className='text-lg font-semibold text-gray-800 mb-3 group-hover:text-primary transition-colors'>{item.title}</h4>
-              <p className='text-gray-500 leading-relaxed'>{item.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+            ctx.lineTo(width, height);
+            ctx.closePath();
+            ctx.fill();
 
-    </div>
-  )
+            phase += 0.006;
+            animationFrameId = requestAnimationFrame(draw);
+        };
+        draw();
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            cancelAnimationFrame(animationFrameId);
+        };
+    }, []);
+
+    return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none opacity-80 z-0" />;
+};
+
+const About = () => {
+    return (
+        <div className="pb-20 animate-fade-in-up">
+
+            <div className='relative text-center pt-20 pb-16 px-6 bg-gradient-to-b from-blue-50/20 via-white to-transparent rounded-[2rem] overflow-hidden border border-border-light mb-6 mt-6'>
+                <AboutCalmCanvas />
+                
+                <div className="relative z-10">
+                    <div className="inline-flex items-center gap-2 bg-primary/5 px-4 py-1.5 rounded-full border border-primary/10 mb-4">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                        <span className="text-primary text-[10px] uppercase tracking-widest font-bold">Our Mission</span>
+                    </div>
+
+                    <h1 className='text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-text tracking-tight leading-tight max-w-4xl mx-auto'>
+                        Transforming Healthcare <br />
+                        <span className="text-primary relative">
+                            Access For Everyone
+                            <svg className="absolute left-0 bottom-[-8px] w-full h-2.5 text-primary/10" viewBox="0 0 300 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 9C60 3.5 180 3.5 297 7.5" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+                            </svg>
+                        </span>
+                    </h1>
+                    
+                    <p className='mt-5 text-text-secondary max-w-2xl mx-auto text-base font-medium leading-relaxed'>
+                        Discover the story behind Tabibi and our commitment to making high-quality medical care approachable, calming, and available to everyone, everywhere.
+                    </p>
+                </div>
+            </div>
+
+            <div className='flex flex-col lg:flex-row items-center gap-14 lg:gap-20 py-16'>
+                <div className='relative group flex-shrink-0'>
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent rounded-[2rem] -rotate-3 blur-sm transition-transform duration-500 group-hover:rotate-0"></div>
+                    
+                    <img
+                        className='w-full lg:max-w-md rounded-[1.8rem] shadow-lg relative z-10 border-4 border-white transition-transform duration-500 group-hover:scale-102'
+                        src={assets.about_image}
+                        alt="About Tabibi"
+                    />
+                </div>
+
+                <div className='flex flex-col gap-8 flex-1'>
+                    <div className='space-y-5 text-text-secondary leading-relaxed font-medium text-base'>
+                        <p>
+                            Welcome to <span className='text-primary font-bold'>Tabibi</span>, your trusted companion in managing your healthcare journey conveniently and efficiently. We understand the challenges individuals experience when scheduling consultations, monitoring diagnostics, and tracking health records.
+                        </p>
+                        <p>
+                            At Tabibi, we are committed to absolute excellence in healthcare technology. We continuously innovate, integrating the latest advancements to reduce patient anxiety, streamline workflows, and prioritize mental comfort alongside clinical efficiency.
+                        </p>
+                    </div>
+
+                    <div className='bg-gradient-to-br from-primary/5 to-transparent p-8 rounded-2xl border border-primary/10 relative overflow-hidden'>
+                        <span className="absolute top-2 left-4 text-7xl font-black text-primary/10 select-none">&ldquo;</span>
+                        <h3 className='text-xs font-bold text-primary uppercase tracking-widest mb-3 relative z-10'>
+                            Our Unified Vision
+                        </h3>
+                        <p className='text-text-secondary relative z-10 font-medium text-sm leading-relaxed'>
+                            Our goal at Tabibi is to build a seamless, completely friction-free healthcare portal for every user. We bridge the gap between patients and specialized caretakers, providing direct access to premium care when you need it most.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div className='mt-24'>
+                <div className='mb-10'>
+                    <h2 className='text-3xl font-display font-extrabold text-text tracking-tight'>Why Patients Choose Tabibi</h2>
+                    <div className='h-0.5 w-16 bg-primary rounded-full mt-3'></div>
+                </div>
+
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+                    {[
+                        {
+                            title: "Absolute Efficiency",
+                            desc: "Friction-free, calming appointment slot booking integrated with patient scheduling timelines.",
+                            tag: "Time-Saving"
+                        },
+                        {
+                            title: "Seamless Convenience",
+                            desc: "Instant directory filters and dedicated specialist recommendations direct to your screen.",
+                            tag: "Easy Access"
+                        },
+                        {
+                            title: "Empathetic Focus",
+                            desc: "Soothing visual flows, breathing guides, and real-time form checks designed to lower anxiety.",
+                            tag: "Wellness-Centered"
+                        }
+                    ].map((item, index) => (
+                        <div
+                            key={index}
+                            style={{ animationDelay: `${index * 50}ms` }}
+                            className='bg-white p-7 rounded-2xl border border-border-light hover:shadow-md transition-all duration-300 animate-fade-in-up'
+                        >
+                            <span className='inline-block text-[10px] font-bold bg-primary/5 text-primary px-3 py-1.5 rounded-full uppercase tracking-wider mb-4'>{item.tag}</span>
+                            <h3 className='text-lg font-display font-bold text-text mb-2'>{item.title}</h3>
+                            <p className='text-text-secondary leading-relaxed font-medium text-sm'>{item.desc}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+        </div>
+    )
 }
 
 export default About

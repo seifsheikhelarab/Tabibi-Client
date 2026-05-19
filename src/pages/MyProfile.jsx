@@ -7,6 +7,11 @@ import { uploadApi } from '../api/client'
 const MyProfile = () => {
     const { patientData, setPatientData, updateUserProfileData, createPatientProfile, session } = useContext(AppContext)
     const [isEdit, setIsEdit] = useState(false)
+    const [isSaving, setIsSaving] = useState(false)
+
+    // Form validation states
+    const [errors, setErrors] = useState({})
+    const [shakeField, setShakeField] = useState('')
 
     const formatDate = (dateStr) => {
         if (!dateStr) return 'Not set'
@@ -34,14 +39,56 @@ const MyProfile = () => {
         }
     }
 
+    // Real-time phone format check
+    const validatePhone = (value) => {
+        if (!value) return true; // Optional field
+        const valid = /^\+?[0-9\s-]{7,15}$/.test(value)
+        setErrors(prev => ({ ...prev, phone: !valid }))
+        return valid
+    }
+
+    // Real-time text check
+    const validateName = (name, field) => {
+        const valid = name.trim().length > 0
+        setErrors(prev => ({ ...prev, [field]: !valid }))
+        return valid
+    }
+
+    const triggerShake = (field) => {
+        setShakeField(field)
+        setTimeout(() => setShakeField(''), 400)
+    }
+
     const handleUpdateProfile = async () => {
+        // Validate final inputs
+        const isFirstNameValid = validateName(patientData?.firstName || '', 'firstName')
+        const isLastNameValid = validateName(patientData?.lastName || '', 'lastName')
+        const isPhoneValid = validatePhone(patientData?.phone || '')
+
+        if (!isFirstNameValid) {
+            triggerShake('firstName')
+            return toast.error('First name cannot be empty')
+        }
+        if (!isLastNameValid) {
+            triggerShake('lastName')
+            return toast.error('Last name cannot be empty')
+        }
+        if (!isPhoneValid) {
+            triggerShake('phone')
+            return toast.error('Please enter a valid phone number')
+        }
+
         try {
+            setIsSaving(true)
             let imageUrl = patientData?.image
 
             if (newImageFile) {
                 const uploadResult = await uploadApi.uploadImage(newImageFile)
                 imageUrl = uploadResult.url
             }
+
+            // Optimistic 800ms loading visual delay for soothing UI consistency
+            await new Promise(resolve => setTimeout(resolve, 800))
 
             const success = await updateUserProfileData({
                 firstName: patientData?.firstName,
@@ -60,6 +107,8 @@ const MyProfile = () => {
             }
         } catch (error) {
             toast.error(error.message)
+        } finally {
+            setIsSaving(false)
         }
     }
 
@@ -74,112 +123,179 @@ const MyProfile = () => {
     const fullName = `${patientData.firstName || ''} ${patientData.lastName || ''}`.trim() || session?.user?.name || 'User'
 
     return (
-        <div className='max-w-2xl mx-auto py-8 animate-fade-in-up'>
-            {/* Header */}
-            <div className='flex flex-col sm:flex-row items-center gap-6 mb-10'>
-                <div className='relative'>
-                    {isEdit
-                        ? <label htmlFor='image' className='cursor-pointer block'>
-                            <div className='w-28 h-28 rounded-full overflow-hidden bg-gray-100'>
-                                <img className='w-full h-full object-cover opacity-70 hover:opacity-100 transition-opacity' src={image || patientData?.image || assets.profile_icon} alt="" />
-                            </div>
-                            <div className='absolute bottom-0 right-0 w-8 h-8 bg-primary rounded-full flex items-center justify-center'>
-                                <img className='w-4' src={assets.upload_icon} alt="" />
+        <div className='max-w-2xl mx-auto py-8 animate-fade-in-up relative'>
+            
+            {/* Optimistic saving progress element */}
+            {isSaving && (
+                <div className="absolute top-0 inset-x-0 h-1 bg-primary/10 overflow-hidden rounded-full z-50">
+                    <div className="h-full bg-primary rounded-full animate-[pulse-ring_1.5s_infinite] w-2/3"></div>
+                </div>
+            )}
+
+            <div className='flex flex-col sm:flex-row items-center gap-6 mb-10 bg-white p-6 rounded-2xl border border-border-light shadow-sm'>
+                <div className='relative group'>
+                    {isEdit ? (
+                        <label htmlFor='image' className='cursor-pointer block relative overflow-hidden rounded-full border-4 border-white shadow-md'>
+                            <div className='w-28 h-28 bg-gray-100 overflow-hidden relative'>
+                                <img className='w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-75' src={image || patientData?.image || assets.profile_icon} alt="" />
+                                <div className='absolute inset-0 bg-primary/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
+                                    <img className='w-5 invert opacity-90' src={assets.upload_icon} alt="" />
+                                </div>
                             </div>
                             <input onChange={handleImageChange} type="file" id="image" hidden accept="image/*" />
                         </label>
-                        : <div className='w-28 h-28 rounded-full overflow-hidden bg-gray-100'>
+                    ) : (
+                        <div className='w-28 h-28 rounded-full overflow-hidden bg-gray-100 border-4 border-white shadow-md transition-transform duration-500 hover:scale-105'>
                             <img className='w-full h-full object-cover' src={patientData?.image || assets.profile_icon} alt="" />
                         </div>
-                    }
+                    )}
                 </div>
 
-                <div className='flex-1 text-center sm:text-left'>
-                    {isEdit
-                        ? (
-                            <div className="flex flex-col sm:flex-row gap-3">
-                                <input className='bg-gray-50 px-4 py-3 rounded-lg text-xl font-medium w-full' type="text"
-                                    onChange={(e) => setPatientData(prev => ({ ...prev, firstName: e.target.value }))}
-                                    value={patientData?.firstName || ''} placeholder="First name" />
-                                <input className='bg-gray-50 px-4 py-3 rounded-lg text-xl font-medium w-full' type="text"
-                                    onChange={(e) => setPatientData(prev => ({ ...prev, lastName: e.target.value }))}
-                                    value={patientData?.lastName || ''} placeholder="Last name" />
-                            </div>
-                        )
-                        : <h1 className='text-2xl font-semibold text-gray-800'>{fullName}</h1>
-                    }
-                    <p className='text-gray-500 mt-1'>{patientData?.email || session?.user?.email}</p>
+                <div className='flex-1 text-center sm:text-left w-full'>
+                    {isEdit ? (
+                        <div className="flex flex-col sm:flex-row gap-3.5 w-full">
+                            <input 
+                                className={`bg-gray-50/80 border px-4 py-3 rounded-xl text-lg font-bold w-full transition-all focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none ${
+                                    errors.firstName ? 'border-red-400 bg-red-50/10' : 'border-gray-100'
+                                } ${shakeField === 'firstName' ? 'animate-soft-shake' : ''}`} 
+                                type="text"
+                                onChange={(e) => {
+                                    setPatientData(prev => ({ ...prev, firstName: e.target.value }))
+                                    validateName(e.target.value, 'firstName')
+                                }}
+                                value={patientData?.firstName || ''} 
+                                placeholder="First name" 
+                            />
+                            <input 
+                                className={`bg-gray-50/80 border px-4 py-3 rounded-xl text-lg font-bold w-full transition-all focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none ${
+                                    errors.lastName ? 'border-red-400 bg-red-50/10' : 'border-gray-100'
+                                } ${shakeField === 'lastName' ? 'animate-soft-shake' : ''}`} 
+                                type="text"
+                                onChange={(e) => {
+                                    setPatientData(prev => ({ ...prev, lastName: e.target.value }))
+                                    validateName(e.target.value, 'lastName')
+                                }}
+                                value={patientData?.lastName || ''} 
+                                placeholder="Last name" 
+                            />
+                        </div>
+                    ) : (
+                        <h1 className='text-3xl font-display font-extrabold text-text tracking-tight transition-all duration-300'>{fullName}</h1>
+                    )}
+                    <p className='text-text-muted mt-1 font-medium text-sm'>{patientData?.email || session?.user?.email}</p>
                 </div>
             </div>
 
-            {/* Contact Information */}
-            <div className='bg-white rounded-2xl p-6 shadow-sm mb-6'>
-                <h2 className='text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4'>Contact Information</h2>
+            <div className='bg-white rounded-2xl p-6 border border-border-light shadow-sm mb-6'>
+                <h2 className='text-xs font-bold text-text-muted uppercase tracking-widest mb-5'>Contact Details</h2>
                 <div className='space-y-4'>
-                    <div className='flex justify-between items-center'>
-                        <span className='text-gray-500'>Email</span>
-                        <span className='text-gray-800'>{patientData?.email || session?.user?.email}</span>
+                    <div className='flex justify-between items-center py-2 border-b border-border-light'>
+                        <span className='text-text-secondary font-medium text-sm'>Email Address</span>
+                        <span className='text-text font-semibold text-sm'>{patientData?.email || session?.user?.email}</span>
                     </div>
-                    <div className='flex justify-between items-center'>
-                        <span className='text-gray-500'>Phone</span>
-                        {isEdit
-                            ? <input className='bg-gray-50 px-3 py-2 rounded-lg text-right' type="text"
-                                onChange={(e) => setPatientData(prev => ({ ...prev, phone: e.target.value }))}
-                                value={patientData?.phone || ''} placeholder="Add phone number" />
-                            : <span className='text-gray-800'>{patientData?.phone || 'Not set'}</span>
-                        }
+                    
+                    <div className='flex justify-between items-center py-2 border-b border-border-light'>
+                        <span className='text-text-secondary font-medium text-sm'>Mobile Phone</span>
+                        {isEdit ? (
+                            <input 
+                                className={`bg-gray-50/80 border px-4 py-2.5 rounded-xl text-right text-sm transition-all focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none max-w-[200px] ${
+                                    errors.phone ? 'border-red-400 bg-red-50/10' : 'border-gray-100'
+                                } ${shakeField === 'phone' ? 'animate-soft-shake' : ''}`} 
+                                type="text"
+                                onChange={(e) => {
+                                    setPatientData(prev => ({ ...prev, phone: e.target.value }))
+                                    validatePhone(e.target.value)
+                                }}
+                                value={patientData?.phone || ''} 
+                                placeholder="Add mobile phone" 
+                            />
+                        ) : (
+                            <span className='text-text font-semibold text-sm'>{patientData?.phone || 'Not provided'}</span>
+                        )}
                     </div>
-                    <div className='flex justify-between items-center'>
-                        <span className='text-gray-500'>Address</span>
-                        {isEdit
-                            ? <input className='bg-gray-50 px-3 py-2 rounded-lg text-right' type="text"
+
+                    <div className='flex justify-between items-center py-2'>
+                        <span className='text-text-secondary font-medium text-sm'>Home Address</span>
+                        {isEdit ? (
+                            <input 
+                                className='bg-gray-50/80 border border-gray-100 px-4 py-2.5 rounded-xl text-right text-sm transition-all focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none max-w-[240px]' 
+                                type="text"
                                 onChange={(e) => setPatientData(prev => ({ ...prev, address: e.target.value }))}
-                                value={patientData?.address || ''} placeholder="Add address" />
-                            : <span className='text-gray-800'>{patientData?.address || 'Not set'}</span>
-                        }
+                                value={patientData?.address || ''} 
+                                placeholder="Add home address" 
+                            />
+                        ) : (
+                            <span className='text-text font-semibold text-sm'>{patientData?.address || 'Not provided'}</span>
+                        )}
                     </div>
                 </div>
             </div>
 
-            {/* Basic Information */}
-            <div className='bg-white rounded-2xl p-6 shadow-sm mb-6'>
-                <h2 className='text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4'>Basic Information</h2>
+            <div className='bg-white rounded-2xl p-6 border border-border-light shadow-sm mb-6'>
+                <h2 className='text-xs font-bold text-text-muted uppercase tracking-widest mb-5'>Personal Details</h2>
                 <div className='space-y-4'>
-                    <div className='flex justify-between items-center'>
-                        <span className='text-gray-500'>Gender</span>
-                        {isEdit
-                            ? <select className='bg-gray-50 px-3 py-2 rounded-lg'
+                    <div className='flex justify-between items-center py-2 border-b border-border-light'>
+                        <span className='text-text-secondary font-medium text-sm'>Gender</span>
+                        {isEdit ? (
+                            <select 
+                                className='bg-gray-50/80 border border-gray-100 px-4 py-2.5 rounded-xl text-sm transition-all focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none cursor-pointer text-gray-700 font-medium'
                                 onChange={(e) => setPatientData(prev => ({ ...prev, gender: e.target.value }))}
-                                value={patientData?.gender || 'Not Selected'} >
-                                <option value="Not Selected">Not Selected</option>
+                                value={patientData?.gender || 'Not Selected'} 
+                            >
+                                <option value="Not Selected">Prefer not to say</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
                             </select>
-                            : <span className='text-gray-800'>{patientData?.gender || 'Not set'}</span>
-                        }
+                        ) : (
+                            <span className='text-text font-semibold text-sm'>{patientData?.gender || 'Not specified'}</span>
+                        )}
                     </div>
-                    <div className='flex justify-between items-center'>
-                        <span className='text-gray-500'>Birthday</span>
-                        {isEdit
-                            ? <input className='bg-gray-50 px-3 py-2 rounded-lg' type='date'
+                    
+                    <div className='flex justify-between items-center py-2'>
+                        <span className='text-text-secondary font-medium text-sm'>Date of Birth</span>
+                        {isEdit ? (
+                            <input 
+                                className='bg-gray-50/80 border border-gray-100 px-4 py-2.5 rounded-xl text-sm transition-all focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none text-gray-700 font-medium' 
+                                type='date'
                                 onChange={(e) => setPatientData(prev => ({ ...prev, dateOfBirth: e.target.value }))}
-                                value={patientData?.dateOfBirth ? patientData.dateOfBirth.split('T')[0] : ''} />
-                            : <span className='text-gray-800'>{formatDate(patientData?.dateOfBirth)}</span>
-                        }
+                                value={patientData?.dateOfBirth ? patientData.dateOfBirth.split('T')[0] : ''} 
+                            />
+                        ) : (
+                            <span className='text-text font-semibold text-sm'>{formatDate(patientData?.dateOfBirth)}</span>
+                        )}
                     </div>
                 </div>
             </div>
 
-            {/* Actions */}
             <div className='flex justify-end gap-3'>
-                {isEdit
-                    ? <button onClick={() => setIsEdit(false)} className='px-6 py-3 rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors'>Cancel</button>
-                    : null
-                }
-                {isEdit
-                    ? <button onClick={handleUpdateProfile} className='px-6 py-3 rounded-full bg-primary text-white hover:opacity-90 transition-all'>Save Changes</button>
-                    : <button onClick={() => setIsEdit(true)} className='px-6 py-3 rounded-full border border-primary text-primary hover:bg-primary hover:text-white transition-all'>Edit Profile</button>
-                }
+                {isEdit && (
+                    <button 
+                        onClick={() => {
+                            setIsEdit(false)
+                            setErrors({})
+                        }} 
+                        disabled={isSaving}
+                        className='px-6 py-3 rounded-xl border border-border text-text-secondary hover:bg-surface-raised transition-all font-semibold active:scale-[0.97] text-sm disabled:opacity-40'
+                    >
+                        Cancel
+                    </button>
+                )}
+                {isEdit ? (
+                    <button 
+                        onClick={handleUpdateProfile} 
+                        disabled={isSaving}
+                        className='px-7 py-3 rounded-xl bg-primary text-white hover:opacity-95 transition-all font-semibold active:scale-[0.97] shadow-md text-sm disabled:opacity-40 flex items-center gap-2'
+                    >
+                        {isSaving ? 'Saving Changes...' : 'Save Changes'}
+                    </button>
+                ) : (
+                    <button 
+                        onClick={() => setIsEdit(true)} 
+                        className='px-7 py-3 rounded-xl border border-primary text-primary hover:bg-primary hover:text-white transition-all font-semibold active:scale-[0.97] text-sm'
+                    >
+                        Edit Information
+                    </button>
+                )}
             </div>
         </div>
     )

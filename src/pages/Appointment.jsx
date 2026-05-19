@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 import { assets } from '../assets/assets'
@@ -6,8 +6,62 @@ import RelatedDoctors from '../components/RelatedDoctors'
 import { toast } from 'react-toastify'
 import { appointmentsApi } from '../api/client'
 
-const Appointment = () => {
+// Peaceful ambient flow background for the doctor card
+const CalmingCardBackground = () => {
+    const canvasRef = useRef(null);
 
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let animationFrameId;
+        let width = canvas.width = canvas.offsetWidth;
+        let height = canvas.height = canvas.offsetHeight;
+
+        const handleResize = () => {
+            if (!canvas) return;
+            width = canvas.width = canvas.offsetWidth;
+            height = canvas.height = canvas.offsetHeight;
+        };
+        window.addEventListener('resize', handleResize);
+
+        let phase = 0;
+        const draw = () => {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, width, height);
+
+            // Breathe cycle slow drift
+            const time = Date.now() * 0.0006;
+            const breathe = Math.sin(time) * 0.5 + 0.5;
+
+            ctx.beginPath();
+            ctx.fillStyle = 'rgba(95, 111, 255, 0.02)';
+            ctx.moveTo(0, height);
+            for (let x = 0; x <= width; x += 5) {
+                const y = height * 0.4 + 
+                          Math.sin(x * 0.006 + phase) * (15 + breathe * 20) + 
+                          Math.cos(x * 0.003 - phase) * (8 + breathe * 10);
+                ctx.lineTo(x, y);
+            }
+            ctx.lineTo(width, height);
+            ctx.closePath();
+            ctx.fill();
+
+            phase += 0.008;
+            animationFrameId = requestAnimationFrame(draw);
+        };
+        draw();
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            cancelAnimationFrame(animationFrameId);
+        };
+    }, []);
+
+    return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none opacity-80 z-0" />;
+};
+
+const Appointment = () => {
     const { docId } = useParams()
     const { doctors, currencySymbol, patientData, getDoctosData, loadPatientAppointments } = useContext(AppContext)
     const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
@@ -16,6 +70,11 @@ const Appointment = () => {
     const [docSlots, setDocSlots] = useState([])
     const [slotIndex, setSlotIndex] = useState(0)
     const [slotTime, setSlotTime] = useState('')
+
+    // Calming Booking states
+    const [isBooking, setIsBooking] = useState(false)
+    const [bookingSuccess, setBookingSuccess] = useState(false)
+    const [breatheStage, setBreatheStage] = useState('Inhale peace...')
 
     const navigate = useNavigate()
 
@@ -111,11 +170,17 @@ const Appointment = () => {
         }
 
         try {
+            setIsBooking(true)
+            setBookingSuccess(false)
+
             const timeMatch = selectedSlot.datetime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }).match(/(\d{2}):(\d{2})/);
             const startTime = timeMatch ? `${timeMatch[1]}:${timeMatch[2]}` : selectedSlot.time.split(' ')[0];
             const endDate = new Date(selectedSlot.datetime.getTime() + 30 * 60000);
             const endTimeMatch = endDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }).match(/(\d{2}):(\d{2})/);
             const endTime = endTimeMatch ? `${endTimeMatch[1]}:${endTimeMatch[2]}` : '00:00';
+
+            // Wait a peaceful 4.5s breathing cycle before securing the spot
+            await new Promise(resolve => setTimeout(resolve, 4500))
 
             await appointmentsApi.create({
                 doctorId: docId,
@@ -127,13 +192,13 @@ const Appointment = () => {
                 fees: docInfo.fees
             })
             
-            toast.success('Appointment request submitted')
+            setBookingSuccess(true)
             getDoctosData()
             loadPatientAppointments()
-            navigate('/my-appointments')
         } catch (error) {
             console.log(error)
             toast.error(error.message)
+            setIsBooking(false)
         }
     }
 
@@ -149,6 +214,18 @@ const Appointment = () => {
         }
     }, [docInfo])
 
+    // Calming breathing guide cycle sync
+    useEffect(() => {
+        if (!isBooking || bookingSuccess) return;
+        const stages = ['Inhale peace...', 'Hold calmly...', 'Exhale anxiety...', 'Hold calmly...'];
+        let idx = 0;
+        const interval = setInterval(() => {
+            idx = (idx + 1) % stages.length;
+            setBreatheStage(stages[idx]);
+        }, 1875); // 7.5s cycle split into 4 parts
+        return () => clearInterval(interval);
+    }, [isBooking, bookingSuccess]);
+
     if (!docInfo) {
         return (
             <div className='flex items-center justify-center min-h-[60vh]'>
@@ -162,48 +239,63 @@ const Appointment = () => {
 
     return (
         <div className="max-w-4xl mx-auto pb-20 animate-fade-in-up">
-            {/* Doctor Info */}
-            <div className='bg-white rounded-2xl shadow-sm overflow-hidden'>
-                <div className='flex flex-col md:flex-row'>
-                    <div className='md:w-72'>
-                        <img className='w-full h-64 md:h-full object-cover' src={docInfo.image || assets.doc_img} alt={doctorName} />
+            <div className='bg-white rounded-2xl shadow-sm border border-border-light overflow-hidden relative p-6 sm:p-8 mb-8'>
+                <CalmingCardBackground />
+
+                <div className='flex flex-col md:flex-row gap-8 relative z-10 items-center md:items-start'>
+                    
+                    <div className='w-64 h-64 sm:w-72 sm:h-72 flex-shrink-0 relative overflow-hidden rounded-2xl border-4 border-white shadow-md hover:scale-102 transition-transform duration-500 bg-surface-raised'>
+                        <img className='w-full h-full object-cover object-top' src={docInfo.image || assets.doc_img} alt={doctorName} />
+                        
+                        <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 bg-white shadow-sm">
+                            <span className={`w-1.5 h-1.5 rounded-full ${docInfo.available ? "bg-green-500" : "bg-gray-400"}`}></span>
+                            <span className={docInfo.available ? "text-green-700 font-bold" : "text-text-muted font-bold"}>
+                                {docInfo.available ? "Active" : "Busy"}
+                            </span>
+                        </div>
                     </div>
 
-                    <div className='flex-1 p-6 md:p-8'>
-                        <div className='flex items-center gap-2'>
-                            <h1 className='text-2xl font-semibold text-gray-800'>{doctorName}</h1>
-                            <img className='w-5' src={assets.verified_icon} alt="" />
+                    <div className='flex-1 w-full text-center md:text-left'>
+                        <div className='flex flex-col md:flex-row items-center gap-3 justify-center md:justify-start'>
+                            <h1 className='text-3xl font-display font-extrabold text-text tracking-tight'>{doctorName}</h1>
+                            <img className='w-5' src={assets.verified_icon} alt="Verified badge" />
                         </div>
-                        <div className='flex items-center gap-2 mt-2 text-gray-500'>
-                            <span>{docInfo.degree}</span>
-                            <span className='text-gray-300'>•</span>
+                        
+                        <div className='flex flex-wrap items-center justify-center md:justify-start gap-2.5 mt-3.5 text-text-secondary font-medium text-sm'>
+                            <span className="px-3 py-1 bg-white border border-border-light rounded-xl text-primary font-bold shadow-sm">{docInfo.degree}</span>
+                            <span className='text-border hidden sm:inline'>&bull;</span>
                             <span>{docInfo.specialization || docInfo.speciality}</span>
-                            <span className='px-2 py-1 bg-gray-100 rounded-full text-xs'>{docInfo.experience} years exp.</span>
+                            <span className='text-border hidden sm:inline'>&bull;</span>
+                            <span className='px-3 py-1 bg-primary/5 text-primary rounded-xl text-xs font-bold'>{docInfo.experience} Years Exp.</span>
                         </div>
 
-                        <div className='flex items-center gap-1 mt-3'>
-                            <span className='text-yellow-500'>★</span>
-                            <span className='font-medium text-gray-800'>{avgRating.toFixed(1)}</span>
-                            <span className='text-gray-400 text-sm'>({docInfo.numRatings || 0} reviews)</span>
+                        <div className='flex items-center justify-center md:justify-start gap-1.5 mt-4'>
+                            <span className='text-amber text-lg'>&#9733;</span>
+                            <span className='font-bold text-text text-base'>{avgRating.toFixed(1)}</span>
+                            <span className='text-text-muted text-xs font-medium'>({docInfo.numRatings || 0} trusted reviews)</span>
                         </div>
 
-                        <div className='mt-5'>
-                            <h3 className='text-sm font-medium text-gray-600 mb-1'>About</h3>
-                            <p className='text-gray-500 text-sm leading-relaxed'>{docInfo.about}</p>
+                        <div className='mt-6 bg-white p-5 rounded-2xl border border-border-light text-left'>
+                            <h3 className='text-xs font-bold text-text-muted uppercase tracking-widest mb-2.5'>Professional Background</h3>
+                            <p className='text-text-secondary text-sm leading-relaxed font-medium'>{docInfo.about}</p>
                         </div>
 
-                        <div className='mt-5 pt-5 border-t'>
-                            <span className='text-gray-500'>Appointment fee: </span>
-                            <span className='text-xl font-semibold text-gray-800'>{currencySymbol}{docInfo.fees}</span>
+                        <div className='mt-6 pt-5 border-t border-gray-100 flex items-center justify-between'>
+                            <span className='text-gray-400 font-bold text-sm uppercase tracking-wider'>Session Booking Fee:</span>
+                            <span className='text-3xl font-extrabold text-gray-900'>{currencySymbol}{docInfo.fees}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Booking Slots */}
-            <div className='mt-8'>
-                <h2 className='text-lg font-semibold text-gray-800 mb-4'>Select a Date</h2>
-                <div className='flex gap-3 overflow-x-auto pb-2'>
+            {/* Date-and-Slot Selectors with tactile dynamic hover styles */}
+            <div className='mt-10 bg-white rounded-2xl p-6 sm:p-8 border border-border-light shadow-sm'>
+                <h2 className='text-xl font-display font-extrabold text-text mb-5 tracking-tight flex items-center gap-2'>
+                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse-ring"></span>
+                    Select a Booking Date
+                </h2>
+                
+                <div className='flex gap-3 overflow-x-auto pb-3.5 pt-1.5 scroll-smooth no-scrollbar'>
                     {docSlots.length > 0 && docSlots.map((item, index) => (
                         item.length > 0 && (
                             <button 
@@ -212,14 +304,14 @@ const Appointment = () => {
                                     setSlotTime('')
                                 }} 
                                 key={index} 
-                                className={`flex-shrink-0 w-16 h-20 rounded-xl flex flex-col items-center justify-center transition-all ${
+                                className={`flex-shrink-0 w-18 h-22 rounded-2xl flex flex-col items-center justify-center transition-all duration-300 transform active:scale-95 ${
                                     slotIndex === index 
-                                    ? 'bg-primary text-white' 
-                                    : 'bg-white border border-gray-200 hover:border-primary'
+                                    ? 'bg-primary text-white scale-105 shadow-lg shadow-primary/20 -translate-y-0.5' 
+                                    : 'bg-gray-50/50 border border-gray-150 text-gray-500 hover:border-primary hover:bg-white hover:text-primary'
                                 }`}
                             >
-                                <span className='text-xs uppercase'>{item[0] && daysOfWeek[item[0].datetime.getDay()]}</span>
-                                <span className={`text-lg font-semibold ${slotIndex === index ? 'text-white' : 'text-gray-800'}`}>
+                                <span className='text-[10px] font-extrabold uppercase tracking-wider'>{item[0] && daysOfWeek[item[0].datetime.getDay()]}</span>
+                                <span className={`text-xl font-black mt-1.5 ${slotIndex === index ? 'text-white' : 'text-gray-800'}`}>
                                     {item[0] && item[0].datetime.getDate()}
                                 </span>
                             </button>
@@ -229,16 +321,21 @@ const Appointment = () => {
 
                 {docSlots[slotIndex]?.length > 0 ? (
                     <>
-                        <h2 className='text-lg font-semibold text-gray-800 mt-6 mb-4'>Select a Time</h2>
-                        <div className='flex flex-wrap gap-2'>
+                        <h2 className='text-xl font-display font-extrabold text-text mt-8 mb-5 tracking-tight flex items-center gap-2'>
+                            <span className="w-2 h-2 rounded-full bg-green"></span>
+                            Available Consultation Slots
+                        </h2>
+                        
+                        <div className='flex flex-wrap gap-2.5'>
                             {docSlots[slotIndex].map((item, index) => (
                                 <button
                                     onClick={() => setSlotTime(item.time)}
                                     key={index}
-                                    className={`px-4 py-2 rounded-lg text-sm transition-all ${
+                                    style={{ animationDelay: `${index * 20}ms` }}
+                                    className={`px-4.5 py-3 rounded-xl text-sm transition-all animate-bubble font-bold active:scale-95 ${
                                         item.time === slotTime
-                                        ? 'bg-primary text-white'
-                                        : 'bg-white border border-gray-200 text-gray-600 hover:border-primary hover:text-primary'
+                                        ? 'bg-primary text-white scale-105 shadow-md shadow-primary/10'
+                                        : 'bg-gray-50/80 border border-gray-100 text-gray-600 hover:border-primary hover:bg-white hover:text-primary'
                                     }`}
                                 >
                                     {item.time}
@@ -247,19 +344,74 @@ const Appointment = () => {
                         </div>
                     </>
                 ) : (
-                    <p className='text-gray-500 mt-4'>No available slots for this selection</p>
+                    <div className="py-8 text-center bg-gray-50 rounded-2xl mt-6 border-2 border-dashed border-gray-150">
+                        <p className='text-gray-500 font-bold'>No consultations available for the selected date.</p>
+                    </div>
                 )}
 
                 <button 
                     onClick={bookAppointment}
                     disabled={!slotTime}
-                    className='w-full md:w-auto px-12 py-4 rounded-xl bg-primary text-white font-medium mt-8 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all'
+                    className='w-full md:w-auto px-12 py-4.5 rounded-xl bg-primary text-white font-extrabold mt-10 hover:opacity-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all transform hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-primary/20 active:scale-98 text-sm'
                 >
-                    Book Appointment
+                    Confirm Booking
                 </button>
             </div>
 
-            <RelatedDoctors speciality={docInfo.specialization || docInfo.speciality} docId={docId} />
+            {/* Related/Specialist Listings */}
+            <div className="mt-12">
+                <RelatedDoctors speciality={docInfo.specialization || docInfo.speciality} docId={docId} />
+            </div>
+
+            {/* Calming Breathing Booking Confirmation full-screen overlay */}
+            {isBooking && (
+                <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white/95 backdrop-blur-md animate-fade-in-up">
+                    <div className="max-w-md w-full px-6 text-center flex flex-col items-center gap-10">
+                        {!bookingSuccess ? (
+                            <>
+                                <div>
+                                    <h2 className="text-2xl font-display font-extrabold text-text tracking-tight">Securing your booking</h2>
+                                    <p className="text-text-secondary mt-2.5 text-sm leading-relaxed font-medium">Let&apos;s take a calming deep breath together while we connect you with {doctorName}.</p>
+                                </div>
+                                
+                                {/* Calming breathing guide circles */}
+                                <div className="relative w-48 h-48 flex items-center justify-center">
+                                    <div className="absolute w-44 h-44 rounded-full bg-primary/5 animate-pulse-ring"></div>
+                                    <div className="absolute w-36 h-36 rounded-full bg-primary/10 animate-breathe-visual"></div>
+                                    <div className="relative z-10 flex flex-col items-center">
+                                        <span className="text-primary font-extrabold text-sm tracking-widest uppercase transition-all duration-500">
+                                            {breatheStage}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="text-text-muted text-[10px] tracking-widest uppercase font-bold">Tabibi Calm booking core</div>
+                            </>
+                        ) : (
+                            <div className="animate-fade-in-up flex flex-col items-center gap-6">
+                                <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center text-green-500 shadow-md animate-bounce">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3.5} stroke="currentColor" className="w-9 h-9">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Booking Confirmed</h2>
+                                    <p className="text-gray-500 mt-3 text-sm leading-relaxed font-semibold">Your session with <strong>{doctorName}</strong> on <strong>{slotTime}</strong> is booked.</p>
+                                </div>
+                                <button 
+                                    onClick={() => {
+                                        setIsBooking(false)
+                                        navigate('/my-appointments')
+                                    }}
+                                    className="w-full sm:w-auto px-8 py-3.5 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/20 hover:opacity-95 transition-all transform hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-sm"
+                                >
+                                    View Appointments
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

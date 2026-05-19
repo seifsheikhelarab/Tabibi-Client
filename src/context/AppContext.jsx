@@ -21,7 +21,22 @@ const AppContextProvider = (props) => {
             // Tabibi-Server returns { data: [...] } for list
             const doctorsList = result?.data ?? result
             if (Array.isArray(doctorsList)) {
-                setDoctors(doctorsList)
+                const normalized = doctorsList.map(doc => {
+                    const name = doc.name || `${doc.firstName || ''} ${doc.lastName || ''}`.trim() || 'Doctor';
+                    const speciality = doc.speciality || doc.specialization || 'General';
+                    const degree = doc.degree || doc.qualification || 'M.B.B.S';
+                    const about = doc.about || doc.bio || 'Professional caregiver.';
+                    const available = typeof doc.available === 'boolean' ? doc.available : (typeof doc.isAvailable === 'boolean' ? doc.isAvailable : true);
+                    return {
+                        ...doc,
+                        name,
+                        speciality,
+                        degree,
+                        about,
+                        available
+                    }
+                })
+                setDoctors(normalized)
             } else {
                 setDoctors([])
             }

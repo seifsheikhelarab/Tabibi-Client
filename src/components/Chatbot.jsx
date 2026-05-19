@@ -3,6 +3,85 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { chatbotApi } from '../api/client';
 
+// Organic calming breathing visualization component
+const BreathingCanvas = () => {
+    const canvasRef = useRef(null);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let animationFrameId;
+        let width = canvas.width = canvas.offsetWidth;
+        let height = canvas.height = canvas.offsetHeight;
+
+        const handleResize = () => {
+            if (!canvas) return;
+            width = canvas.width = canvas.offsetWidth;
+            height = canvas.height = canvas.offsetHeight;
+        };
+        window.addEventListener('resize', handleResize);
+
+        let phase = 0;
+        const render = () => {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, width, height);
+            
+            // Breathe cycle: 8 second cycle (4s in, 4s out)
+            const time = Date.now() * 0.0008;
+            const breathe = Math.sin(time) * 0.5 + 0.5; // 0 to 1
+            
+            // Draw calming organic fluid wave (Main)
+            ctx.beginPath();
+            const gradient = ctx.createLinearGradient(0, 0, width, 0);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.15)');
+            gradient.addColorStop(0.5, `rgba(255, 255, 255, ${0.12 + breathe * 0.08})`);
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0.15)');
+            
+            ctx.fillStyle = gradient;
+            ctx.moveTo(0, height);
+            for (let x = 0; x <= width; x += 4) {
+                const y = height * 0.55 + 
+                          Math.sin(x * 0.008 + phase) * (8 + breathe * 14) + 
+                          Math.cos(x * 0.004 - phase) * (4 + breathe * 8);
+                ctx.lineTo(x, y);
+            }
+            ctx.lineTo(width, height);
+            ctx.closePath();
+            ctx.fill();
+
+            // Draw a second, slower wave for organic depth
+            ctx.beginPath();
+            const gradientSec = ctx.createLinearGradient(0, 0, width, 0);
+            gradientSec.addColorStop(0, 'rgba(255, 255, 255, 0.08)');
+            gradientSec.addColorStop(1, 'rgba(255, 255, 255, 0.05)');
+            
+            ctx.fillStyle = gradientSec;
+            ctx.moveTo(0, height);
+            for (let x = 0; x <= width; x += 4) {
+                const y = height * 0.6 + 
+                          Math.cos(x * 0.01 + phase * 0.7) * (6 + breathe * 10) + 
+                          Math.sin(x * 0.005 - phase * 0.9) * (3 + breathe * 6);
+                ctx.lineTo(x, y);
+            }
+            ctx.lineTo(width, height);
+            ctx.closePath();
+            ctx.fill();
+
+            phase += 0.012;
+            animationFrameId = requestAnimationFrame(render);
+        };
+        render();
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            cancelAnimationFrame(animationFrameId);
+        };
+    }, []);
+
+    return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none opacity-90" />;
+};
+
 const Chatbot = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
@@ -62,10 +141,13 @@ const Chatbot = () => {
                 image: image
             });
 
+            const reply = response.data?.reply || response.data?.response || response.reply || response.message || "I'm sorry, I couldn't get a response.";
+            const doctors = response.data?.doctors || response.doctors || [];
+
             setMessages(prev => [...prev, {
                 role: 'ai',
-                text: response.reply || response.message || "I understand your symptoms. Let me help you find the right specialist.",
-                doctors: response.doctors || []
+                text: reply,
+                doctors: doctors
             }]);
         } catch (error) {
             console.error(error);
@@ -81,144 +163,167 @@ const Chatbot = () => {
     };
 
     return (
-        <div className="fixed bottom-14 right-8 z-50 flex flex-col items-end gap-5 font-sans transition-all duration-300">
+        <div className={`fixed bottom-14 right-8 z-50 flex flex-col items-end gap-4 font-sans ${!isOpen ? 'pointer-events-none' : ''}`}>
+            
+            {/* Chat Window with elegant organic morphing blossom transition */}
+            <div className={`bg-white rounded-2xl shadow-lg border border-border-light w-[350px] sm:w-[410px] h-[540px] max-h-[78vh] flex flex-col overflow-hidden transition-all duration-500 origin-bottom-right ${
+                isOpen 
+                ? 'scale-100 opacity-100 translate-y-0 pointer-events-auto' 
+                : 'scale-[0.1] opacity-0 translate-y-16 pointer-events-none'
+            }`}>
+                
+                {/* Custom Calming Header with Canvas Breathing visualization */}
+                <div className="relative bg-gradient-to-r from-primary to-blue-600 p-6 flex justify-between items-center text-white overflow-hidden">
+                    {/* Organic Breathing Wave Background */}
+                    <BreathingCanvas />
 
-            {/* Chat Window */}
-            {isOpen && (
-                <div className="glass rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] w-[360px] sm:w-[400px] h-[520px] max-h-[75vh] flex flex-col overflow-hidden animate-fade-in-up border border-white/50 ring-1 ring-black/5">
-
-                    {/* Header */}
-                    <div className="bg-gradient-to-r from-primary to-blue-600 p-5 flex justify-between items-center text-white shadow-md">
-                        <div className='flex items-center gap-3'>
-                            <div className='relative'>
-                                <div className='w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm'>
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
-                                    </svg>
-                                </div>
-                                <div className='absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-primary rounded-full'></div>
+                    <div className='flex items-center gap-3 relative z-10'>
+                        <div className='relative'>
+                            <div className='w-11 h-11 bg-white/20 rounded-full flex items-center justify-center shadow-inner transition-transform duration-300 hover:scale-105'>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+                                </svg>
                             </div>
-                            <div>
-                                <h3 className="font-bold text-lg tracking-tight">Tabibi AI</h3>
-                                <p className='text-[10px] text-white/80 uppercase font-bold tracking-widest'>Always Online</p>
+                            <div className='absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-primary rounded-full animate-pulse-ring'></div>
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-lg tracking-tight">Tabibi Calming AI</h3>
+                            <div className='flex items-center gap-1.5'>
+                                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                                <p className='text-[10px] text-white/90 uppercase font-bold tracking-wider'>Breathe &amp; Connect</p>
                             </div>
                         </div>
-                        <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 p-2 rounded-xl transition-all group">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 group-hover:rotate-90 transition-transform">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </div>
+                    
+                    <button onClick={() => setIsOpen(false)} className="relative z-10 hover:bg-white/20 p-2.5 rounded-2xl transition-all group active:scale-95">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 group-hover:rotate-90 transition-transform">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                {/* Calming Messages Area */}
+                <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-5 scroll-smooth bg-gradient-to-b from-blue-50/20 to-white/40">
+                    {messages.map((msg, index) => (
+                        <div key={index} className={`flex flex-col gap-2.5 ${msg.role === 'user' ? 'items-end' : 'items-start'} animate-bubble`}>
+                            
+                            {/* Message Bubble with organic asymmetrical corners */}
+                            <div className={`p-4 rounded-3xl max-w-[85%] text-sm leading-relaxed transition-all shadow-[0_4px_12px_rgba(0,0,0,0.02)] ${msg.role === 'user'
+                                ? 'bg-primary text-white rounded-br-none shadow-md shadow-primary/10'
+                                : 'bg-white text-text border border-border-light rounded-bl-none'
+                                }`}>
+                                {msg.image && (
+                                    <div className='mb-3 overflow-hidden rounded-2xl border border-gray-100 shadow-inner'>
+                                        <img src={msg.image} alt="Uploaded" className="max-w-full transform transition-transform duration-500 hover:scale-105" />
+                                    </div>
+                                )}
+                                <p className="whitespace-pre-line">{msg.text}</p>
+                            </div>
+
+                            {/* Beautiful Doctor Recommendations */}
+                            {msg.doctors && msg.doctors.length > 0 && (
+                                <div className="flex overflow-x-auto gap-4 w-full py-2.5 no-scrollbar scroll-smooth">
+                                    {msg.doctors.map((doc, i) => {
+                                        const doctorName = `${doc.firstName || ''} ${doc.lastName || ''}`.trim() || doc.name || 'Doctor';
+                                        return (
+                                            <div 
+                                                key={i} 
+                                                onClick={() => { navigate(`/appointment/${doc.id || doc._id}`); setIsOpen(false); }}
+                                                className="min-w-[190px] bg-white p-4 rounded-2xl border border-border-light shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center group relative overflow-hidden"
+                                            >
+                                                {/* Card dynamic glow on hover */}
+                                                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                                
+                                                <div className='relative mb-3 z-10'>
+                                                    <img src={doc.image} alt={doctorName} className="w-16 h-16 rounded-full object-cover bg-blue-50 border border-primary/10 group-hover:border-primary transition-all duration-300" />
+                                                    <div className='absolute -bottom-0.5 -right-0.5 bg-green-400 w-4 h-4 rounded-full border-2 border-white shadow-sm'></div>
+                                                </div>
+                                                <p className="text-xs font-bold text-gray-900 group-hover:text-primary transition-colors text-center z-10 line-clamp-1">{doctorName}</p>
+                                                <p className="text-[10px] text-gray-500 mb-4 font-medium z-10">{doc.speciality || doc.specialization}</p>
+                                                <button className='w-full text-[10px] bg-gray-50 text-primary py-2.5 rounded-xl font-bold group-hover:bg-primary group-hover:text-white transition-all shadow-sm z-10 active:scale-95'>
+                                                    Book Slot
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                    {isLoading && (
+                        <div className="flex items-start animate-pulse">
+                            <div className="bg-white p-4 rounded-2xl rounded-bl-none shadow-sm border border-border-light">
+                                <div className="flex gap-1.5 items-center">
+                                    <div className="w-2.5 h-2.5 bg-primary/40 rounded-full animate-bounce"></div>
+                                    <div className="w-2.5 h-2.5 bg-primary/60 rounded-full animate-bounce [animation-delay:0.2s]"></div>
+                                    <div className="w-2.5 h-2.5 bg-primary rounded-full animate-bounce [animation-delay:0.4s]"></div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <div ref={messagesEndRef} />
+                </div>
+
+                {/* Input Area */}
+                <div className="p-5 bg-white border-t border-border-light rounded-b-2xl">
+                    {imagePreview && (
+                        <div className="relative inline-block mb-3 ml-2 group animate-fade-in-up">
+                            <img src={imagePreview} alt="Preview" className="w-20 h-20 object-cover rounded-2xl border border-primary/20 shadow-md ring-4 ring-white" />
+                            <button onClick={removeImage} className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-[10px] shadow-lg hover:bg-red-600 transition-colors transform hover:scale-105 active:scale-95">✕</button>
+                        </div>
+                    )}
+                    <div className="flex gap-2 bg-surface-raised p-2 rounded-xl border border-border-light focus-within:border-primary focus-within:bg-white focus-within:ring-2 focus-within:ring-primary/10 transition-all items-center">
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            ref={fileInputRef}
+                            className="hidden"
+                        />
+                        <button
+                            onClick={() => fileInputRef.current.click()}
+                            className="p-2 rounded-xl transition-all text-gray-400 hover:text-primary hover:bg-primary/5 group"
+                            title="Upload Medical Report/Image"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="currentColor" className="w-5 h-5 transition-transform group-hover:scale-105">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94a3 3 0 114.243 4.243L8.767 17.45a1.5 1.5 0 01-2.121-2.121l10.191-10.191m-4.722 9.91l-3.322 3.322" />
+                            </svg>
+                        </button>
+                        <input
+                            type="text"
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyPress={handleKeyPress}
+                            placeholder={image ? "Describe this image..." : "How can I help you today?"}
+                            className="flex-1 bg-transparent px-2 py-2 outline-none text-sm text-text font-medium placeholder:text-text-muted"
+                        />
+                        <button
+                            onClick={handleSend}
+                            disabled={isLoading}
+                            className="bg-primary hover:opacity-90 text-white p-3 rounded-xl flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-lg shadow-primary/25 active:scale-95"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 ml-0.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
                             </svg>
                         </button>
                     </div>
-
-                    {/* Messages Area */}
-                    <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-6 scroll-smooth bg-transparent">
-                        {messages.map((msg, index) => (
-                            <div key={index} className={`flex flex-col gap-3 ${msg.role === 'user' ? 'items-end' : 'items-start'} animate-fade-in-up`}>
-
-                                {/* Message Bubble */}
-                                <div className={`p-4 rounded-3xl max-w-[88%] text-sm leading-relaxed transition-all transform hover:scale-[1.01] ${msg.role === 'user'
-                                    ? 'bg-gradient-to-br from-primary to-blue-700 text-white rounded-br-none shadow-lg shadow-primary/20'
-                                    : 'bg-white text-gray-800 border border-gray-100 rounded-bl-none shadow-sm'
-                                    }`}>
-                                    {msg.image && (
-                                        <div className='mb-3 overflow-hidden rounded-xl border border-white/30 shadow-inner'>
-                                            <img src={msg.image} alt="Uploaded" className="max-w-full transform transition-transform hover:scale-110 duration-500" />
-                                        </div>
-                                    )}
-                                    <p>{msg.text}</p>
-                                </div>
-
-                                {/* Recommended Doctors Cards */}
-                                {msg.doctors && msg.doctors.length > 0 && (
-                                    <div className="flex overflow-x-auto gap-4 w-full py-2 no-scrollbar">
-                                        {msg.doctors.map((doc, i) => (
-                                            <div key={i} onClick={() => { navigate(`/appointment/${doc._id}`); setIsOpen(false) }}
-                                                className="min-w-[180px] bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col items-center group">
-                                                <div className='relative mb-3'>
-                                                    <img src={doc.image} alt={doc.name} className="w-16 h-16 rounded-full object-cover bg-blue-50 border-2 border-primary/10 group-hover:border-primary transition-colors" />
-                                                    <div className='absolute -bottom-1 -right-1 bg-green-400 w-4 h-4 rounded-full border-2 border-white'></div>
-                                                </div>
-                                                <p className="text-xs font-extra-bold text-gray-900 group-hover:text-primary transition-colors">{doc.name}</p>
-                                                <p className="text-[10px] text-gray-500 mb-3 font-medium">{doc.speciality}</p>
-                                                <button className='w-full text-[10px] bg-gray-50 text-primary py-2 rounded-xl font-bold group-hover:bg-primary group-hover:text-white transition-all shadow-sm'>Book Now</button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                        {isLoading && (
-                            <div className="flex items-start">
-                                <div className="bg-white p-3 rounded-2xl rounded-bl-none shadow-sm border border-gray-100">
-                                    <div className="flex gap-1">
-                                        <div className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"></div>
-                                        <div className="w-2 h-2 bg-gray-300 rounded-full animate-bounce [animation-delay:0.2s]"></div>
-                                        <div className="w-2 h-2 bg-gray-300 rounded-full animate-bounce [animation-delay:0.4s]"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                        <div ref={messagesEndRef} />
-                    </div>
-
-                    {/* Input Area */}
-                    <div className="p-4 bg-white/80 backdrop-blur-md border-t border-white/30 rounded-b-3xl">
-                        {imagePreview && (
-                            <div className="relative inline-block mb-3 ml-2 group">
-                                <img src={imagePreview} alt="Preview" className="w-20 h-20 object-cover rounded-2xl border-2 border-primary/20 shadow-lg ring-4 ring-white" />
-                                <button onClick={removeImage} className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-[12px] shadow-xl hover:bg-red-600 transition-colors transform hover:scale-110 active:scale-95">✕</button>
-                            </div>
-                        )}
-                        <div className="flex gap-2 bg-white/60 p-1.5 rounded-3xl border border-gray-200 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all items-center shadow-inner">
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageChange}
-                                ref={fileInputRef}
-                                className="hidden"
-                            />
-                            <button
-                                onClick={() => fileInputRef.current.click()}
-                                className="p-2.5 rounded-2xl transition-all text-gray-400 hover:text-primary hover:bg-primary/5 group"
-                                title="Upload Medical Report/Image"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 transition-transform group-hover:scale-110">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94a3 3 0 114.243 4.243L8.767 17.45a1.5 1.5 0 01-2.121-2.121l10.191-10.191m-4.722 9.91l-3.322 3.322" />
-                                </svg>
-                            </button>
-                            <input
-                                type="text"
-                                value={input}
-                                onChange={(e) => setInput(e.target.value)}
-                                onKeyPress={handleKeyPress}
-                                placeholder={image ? "Describe this image..." : "How can I help you today?"}
-                                className="flex-1 bg-transparent px-2 py-2 outline-none text-sm text-gray-800 font-medium placeholder:text-gray-400"
-                            />
-                            <button
-                                onClick={handleSend}
-                                disabled={isLoading}
-                                className="bg-primary hover:bg-blue-600 text-white p-3 rounded-2xl flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-lg shadow-primary/30 active:scale-90"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 ml-0.5">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
                 </div>
-            )}
+            </div>
 
-            {/* Floating Button */}
+            {/* Calming, pulsing floating trigger button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="bg-gradient-to-br from-primary to-blue-600 text-white p-5 rounded-[2rem] shadow-[0_15px_30px_rgba(59,130,246,0.3)] hover:shadow-[0_20px_40px_rgba(59,130,246,0.5)] transition-all duration-300 transform hover:-translate-y-2 active:scale-95 flex items-center justify-center ring-4 ring-white/80 backdrop-blur-sm group"
+                className="pointer-events-auto bg-primary text-white p-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 active:scale-[0.97] flex items-center justify-center group relative overflow-hidden"
             >
+                {/* Subtle continuous organic background breathing pulse */}
+                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
+                
                 {isOpen ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8 group-hover:rotate-12 transition-transform">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-7 h-7 group-hover:rotate-90 transition-transform duration-300">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8 group-hover:-rotate-12 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="currentColor" className="w-7 h-7 group-hover:-rotate-6 transition-transform duration-300">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
                     </svg>
                 )}

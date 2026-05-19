@@ -18,7 +18,7 @@ const api = axios.create({
 api.interceptors.request.use(async (config) => {
     // Only attempt to get session if we're not already in the middle of an auth call
     // or if the request is for a protected resource
-    const isPublicRoute = config.url === '/api/doctors' || config.url.startsWith('/api/doctors/') || config.url.startsWith('/api/ratings/doctor/')
+    const isPublicRoute = config.url === '/api/doctors' || config.url.startsWith('/api/doctors/') || config.url.startsWith('/api/ratings/doctor/') || config.url === '/api/pharmacies' || config.url === '/api/labs'
     
     let sessionData = null
     try {
@@ -44,7 +44,7 @@ api.interceptors.request.use(async (config) => {
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        const isPublicRoute = error.config?.url === '/api/doctors' || error.config?.url.startsWith('/api/doctors/')
+        const isPublicRoute = error.config?.url === '/api/doctors' || error.config?.url.startsWith('/api/doctors/') || error.config?.url === '/api/pharmacies' || error.config?.url === '/api/labs'
         
         if (error.response?.status === 401 && !isPublicRoute) {
             authClient.signOut()
