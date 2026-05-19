@@ -1,8 +1,10 @@
 import React from 'react'
 import { assets } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 const Banner = () => {
+    const { t } = useTranslation()
     const navigate = useNavigate()
 
     return (
@@ -12,16 +14,16 @@ const Banner = () => {
 
             <div className='flex-1 py-10 sm:py-14 md:py-20 lg:pl-5 relative z-10'>
                 <div className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white leading-tight'>
-                    <p>Book Appointment</p>
+                    <p>{t('banner.bookAppointment')}</p>
                     <p className='mt-3 text-blue-100'>
-                        With 100+ Trusted Doctors
+                        {t('banner.with100Doctors')}
                     </p>
                 </div>
                 <button
                     onClick={() => { navigate('/login'); scrollTo(0, 0) }}
                     className='bg-white text-sm sm:text-base text-text font-semibold px-9 py-3.5 rounded-xl mt-6 hover:bg-white/95 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 shadow-lg active:scale-[0.98]'
                 >
-                    Create account
+                    {t('banner.createAccount')}
                 </button>
             </div>
 

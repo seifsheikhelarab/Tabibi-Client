@@ -1,9 +1,11 @@
 import React, { useState, useContext, useMemo, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { specialityData } from '../assets/assets'
 import { Link, useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 
 const SpecialistFinder = () => {
+    const { t } = useTranslation()
     const navigate = useNavigate()
     const { doctors, currencySymbol } = useContext(AppContext)
 
@@ -82,7 +84,9 @@ const SpecialistFinder = () => {
         })
     }, [doctors, selectedSpeciality, availableOnly, ratingPreference, feePreference])
 
-    const doctorCountText = matchedDoctors.length === 1 ? '1 matched specialist' : `${matchedDoctors.length} matched specialists`
+    const doctorCountText = matchedDoctors.length === 1 
+        ? t('specialistFinder.singleMatch') 
+        : `${matchedDoctors.length} ${t('specialistFinder.matchesLabel')}`
 
     return (
         <div className='py-12 md:py-20 text-gray-800 max-w-6xl mx-auto px-4 animate-fade-in-up'>
@@ -92,18 +96,18 @@ const SpecialistFinder = () => {
                     onClick={() => navigate(-1)} 
                     className='text-xs font-bold text-gray-400 hover:text-primary transition-colors flex items-center gap-1.5 mb-6 active:scale-95 duration-200'
                 >
-                    ← Back to Previous Page
+                    {t('specialistFinder.backToPreviousPage')}
                 </button>
                 <div className='flex flex-col md:flex-row md:items-end justify-between gap-6'>
                     <div className='max-w-xl'>
                         <span className='text-xs font-bold text-primary uppercase tracking-widest bg-primary/5 px-4 py-1.5 rounded-full inline-block mb-3'>
-                            Guided Matchmaker
+                            {t('specialistFinder.guidedMatchmaker')}
                         </span>
                         <h1 className='text-3xl md:text-4xl font-display font-extrabold text-text tracking-tight'>
-                            Interactive Specialist Finder
+                            {t('specialistFinder.interactiveFinder')}
                         </h1>
                         <p className='text-text-secondary text-sm mt-3 leading-relaxed font-medium'>
-                            Our diagnostic matching tool coordinates your specialty, schedule availability, and session fee preferences to align you with the right specialist.
+                            {t('specialistFinder.diagnosticMatching')}
                         </p>
                     </div>
 
@@ -112,7 +116,7 @@ const SpecialistFinder = () => {
                             onClick={resetFinder}
                             className='text-xs font-bold text-gray-400 hover:text-primary transition-colors flex items-center gap-1.5 active:scale-95 duration-200'
                         >
-                            ✕ Reset & start over
+                            {t('specialistFinder.resetStartOver')}
                         </button>
                     )}
                 </div>
@@ -124,9 +128,9 @@ const SpecialistFinder = () => {
                 {/* Continuous Spring Progress Track */}
                 <div className='mb-12 max-w-md'>
                     <div className='flex justify-between text-[10px] font-bold uppercase tracking-wider text-gray-300 mb-2.5'>
-                        <span className={step >= 1 ? 'text-primary' : ''}>1. Specialty</span>
-                        <span className={step >= 2 ? 'text-primary' : ''}>2. Preferences</span>
-                        <span className={step >= 3 ? 'text-primary' : ''}>3. Matches</span>
+                        <span className={step >= 1 ? 'text-primary' : ''}>{t('specialistFinder.step1')}</span>
+                        <span className={step >= 2 ? 'text-primary' : ''}>{t('specialistFinder.step2')}</span>
+                        <span className={step >= 3 ? 'text-primary' : ''}>{t('specialistFinder.step3')}</span>
                     </div>
                     <div className='h-2 bg-gray-100 rounded-full overflow-hidden relative'>
                         <div 
@@ -147,7 +151,7 @@ const SpecialistFinder = () => {
                     {step === 1 && (
                         <div className='animate-fade-in-up duration-300'>
                             <h2 className='text-xl md:text-2xl font-extrabold text-gray-900 mb-6'>
-                                What clinical department or specialty are you looking for?
+                                {t('specialistFinder.whatDepartment')}
                             </h2>
                             
                             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8'>
@@ -183,7 +187,7 @@ const SpecialistFinder = () => {
                                                     {item.speciality}
                                                 </p>
                                                 <p className='text-gray-400 text-xs mt-1 leading-normal font-medium'>
-                                                    {clinicalDescriptions[item.speciality] || 'Schedule an appointment directly.'}
+                                                    {clinicalDescriptions[item.speciality] || t('specialistFinder.scheduleAnAppointment')}
                                                 </p>
                                             </div>
                                         </button>
@@ -196,7 +200,7 @@ const SpecialistFinder = () => {
                                     to='/doctors' 
                                     className='text-sm font-semibold text-gray-400 hover:text-gray-600 transition-colors'
                                 >
-                                    Browse all specialists manually
+                                    {t('specialistFinder.browseAllSpecialists')}
                                 </Link>
 
                                 <button
@@ -209,7 +213,7 @@ const SpecialistFinder = () => {
                                             : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                     }`}
                                 >
-                                    Next Step →
+                                    {t('specialistFinder.nextStep')}
                                 </button>
                             </div>
                         </div>
@@ -219,13 +223,13 @@ const SpecialistFinder = () => {
                     {step === 2 && (
                         <div className='animate-fade-in-up duration-300 max-w-2xl'>
                             <h2 className='text-xl md:text-2xl font-extrabold text-gray-900 mb-6'>
-                                Tell us a bit about your preference for <span className='text-primary'>{selectedSpeciality}</span>
+                                {t('specialistFinder.tellUsPreference')} <span className='text-primary'>{selectedSpeciality}</span>
                             </h2>
 
                             <div className='space-y-6 mb-10'>
                                 {/* Preference 1: Availability */}
                                 <div className='flex flex-col gap-2 animate-fade-in-up' style={{ animationDelay: '50ms' }}>
-                                    <span className='text-xs font-bold text-gray-400 uppercase tracking-wide'>Appointment Schedule</span>
+                                    <span className='text-xs font-bold text-gray-400 uppercase tracking-wide'>{t('specialistFinder.appointmentSchedule')}</span>
                                     <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
                                         <button
                                             type="button"
@@ -236,7 +240,7 @@ const SpecialistFinder = () => {
                                                     : 'border-gray-100 bg-gray-50 hover:bg-gray-100 text-gray-600'
                                             }`}
                                         >
-                                            Show all schedules
+                                            {t('specialistFinder.showAllSchedules')}
                                         </button>
                                         <button
                                             type="button"
@@ -247,14 +251,14 @@ const SpecialistFinder = () => {
                                                     : 'border-gray-100 bg-gray-50 hover:bg-gray-100 text-gray-600'
                                             }`}
                                         >
-                                            Available today or tomorrow
+                                            {t('specialistFinder.availableToday')}
                                         </button>
                                     </div>
                                 </div>
 
                                 {/* Preference 2: Ratings */}
                                 <div className='flex flex-col gap-2 animate-fade-in-up' style={{ animationDelay: '100ms' }}>
-                                    <span className='text-xs font-bold text-gray-400 uppercase tracking-wide'>Doctor Rating</span>
+                                    <span className='text-xs font-bold text-gray-400 uppercase tracking-wide'>{t('specialistFinder.doctorRating')}</span>
                                     <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
                                         <button
                                             type="button"
@@ -265,7 +269,7 @@ const SpecialistFinder = () => {
                                                     : 'border-gray-100 bg-gray-50 hover:bg-gray-100 text-gray-600'
                                             }`}
                                         >
-                                            All trusted doctors
+                                            {t('specialistFinder.allTrustedDoctors')}
                                         </button>
                                         <button
                                             type="button"
@@ -276,14 +280,14 @@ const SpecialistFinder = () => {
                                                     : 'border-gray-100 bg-gray-50 hover:bg-gray-100 text-gray-600'
                                             }`}
                                         >
-                                            Top-rated specialists only (★4.5+)
+                                            {t('specialistFinder.topRatedOnly')}
                                         </button>
                                     </div>
                                 </div>
 
                                 {/* Preference 3: Fees */}
                                 <div className='flex flex-col gap-2 animate-fade-in-up' style={{ animationDelay: '150ms' }}>
-                                    <span className='text-xs font-bold text-gray-400 uppercase tracking-wide'>Consultation Fee Limit</span>
+                                    <span className='text-xs font-bold text-gray-400 uppercase tracking-wide'>{t('specialistFinder.consultationFeeLimit')}</span>
                                     <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
                                         <button
                                             type="button"
@@ -294,7 +298,7 @@ const SpecialistFinder = () => {
                                                     : 'border-gray-100 bg-gray-50 hover:bg-gray-100 text-gray-600'
                                             }`}
                                         >
-                                            Show all fees
+                                            {t('specialistFinder.showAllFees')}
                                         </button>
                                         <button
                                             type="button"
@@ -305,7 +309,7 @@ const SpecialistFinder = () => {
                                                     : 'border-gray-100 bg-gray-50 hover:bg-gray-100 text-gray-600'
                                             }`}
                                         >
-                                            Budget-friendly (Under 300 {currencySymbol})
+                                            {t('specialistFinder.budgetFriendly')} {currencySymbol})
                                         </button>
                                     </div>
                                 </div>
@@ -317,7 +321,7 @@ const SpecialistFinder = () => {
                                     onClick={handlePrevStep}
                                     className='text-sm font-bold text-gray-400 hover:text-gray-600 transition-colors active:scale-95 duration-200'
                                 >
-                                    ← Back
+                                    {t('specialistFinder.back')}
                                 </button>
 
                                 <button
@@ -325,7 +329,7 @@ const SpecialistFinder = () => {
                                     onClick={handleNextStep}
                                     className='px-7 py-3 rounded-xl text-sm font-bold bg-primary text-white hover:shadow-lg hover:shadow-primary/20 shadow-sm transition-all active:scale-[0.97]'
                                 >
-                                    Find Matches →
+                                    {t('specialistFinder.findMatches')}
                                 </button>
                             </div>
                         </div>
@@ -337,10 +341,10 @@ const SpecialistFinder = () => {
                             <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 animate-fade-in-up' style={{ animationDelay: '50ms' }}>
                                 <div>
                                     <h2 className='text-xl md:text-2xl font-extrabold text-gray-900'>
-                                        Your Curated {selectedSpeciality} Matches
+                                        {t('specialistFinder.yourCuratedMatches')} {selectedSpeciality} {t('specialistFinder.matches')}
                                     </h2>
                                     <p className='text-gray-400 text-sm font-semibold mt-1'>
-                                        Based on your schedule and rating choices we found <span className='text-primary font-bold'>{doctorCountText}</span>.
+                                        {t('specialistFinder.basedOnChoices')} <span className='text-primary font-bold'>{doctorCountText}</span>.
                                     </p>
                                 </div>
 
@@ -349,7 +353,7 @@ const SpecialistFinder = () => {
                                         onClick={() => navigate(`/doctors/${selectedSpeciality}`)}
                                         className='text-sm font-bold text-primary hover:underline self-start sm:self-center active:scale-95 duration-200'
                                     >
-                                        View all specialists in this department →
+                                        {t('specialistFinder.viewAllSpecialists')}
                                     </button>
                                 )}
                             </div>
@@ -384,7 +388,7 @@ const SpecialistFinder = () => {
                                                             <div className='flex items-center gap-1 mt-1'>
                                                                 <span className={`w-2 h-2 rounded-full ${item.available ? "bg-green-500" : "bg-gray-400"}`}></span>
                                                                 <span className={`text-[10px] font-bold ${item.available ? "text-green-700" : "text-gray-400"}`}>
-                                                                    {item.available ? "Available" : "Schedule full"}
+                                                                    {item.available ? t('specialistFinder.available') : t('specialistFinder.scheduleFull')}
                                                                 </span>
                                                             </div>
                                                         </div>
@@ -397,13 +401,13 @@ const SpecialistFinder = () => {
 
                                                 <div className='flex items-center justify-between pt-4 border-t border-gray-100/60'>
                                                     <div>
-                                                        <p className='text-[10px] font-bold text-gray-400 uppercase tracking-wider'>Consultation fee</p>
+                                                        <p className='text-[10px] font-bold text-gray-400 uppercase tracking-wider'>{t('specialistFinder.consultationFee')}</p>
                                                         <p className='text-sm font-extrabold text-gray-900'>{currencySymbol} {item.fees}</p>
                                                     </div>
 
                                                     <div className='flex items-center gap-1 bg-white px-2.5 py-1.5 rounded-xl border border-gray-100'>
                                                         <span className='text-yellow-500 text-xs font-extrabold'>★</span>
-                                                        <span className='text-xs font-bold text-gray-700'>{avgRating > 0 ? avgRating.toFixed(1) : 'New'}</span>
+                                                        <span className='text-xs font-bold text-gray-700'>{avgRating > 0 ? avgRating.toFixed(1) : t('specialistFinder.new')}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -413,9 +417,9 @@ const SpecialistFinder = () => {
                             ) : (
                                 <div className='bg-gray-50/50 rounded-2xl p-10 text-center flex flex-col items-center justify-center max-w-lg mx-auto mb-8 border border-dashed border-gray-200 animate-fade-in-up' style={{ animationDelay: '150ms' }}>
                                     <div className='w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 text-xl font-bold mb-4'>?</div>
-                                    <h3 className='text-base font-extrabold text-gray-800 mb-1'>No exact match matches your criteria</h3>
+                                    <h3 className='text-base font-extrabold text-gray-800 mb-1'>{t('specialistFinder.noExactMatch')}</h3>
                                     <p className='text-xs text-gray-400 leading-relaxed font-semibold mb-6'>
-                                        We couldn't find specialists matching all your preferences in {selectedSpeciality}. Try loosening your budget or rating limits.
+                                        {t('specialistFinder.couldNotFind')} {selectedSpeciality}. {t('specialistFinder.tryLoosening')}
                                     </p>
                                     <button
                                         type="button"
@@ -426,7 +430,7 @@ const SpecialistFinder = () => {
                                         }}
                                         className='text-xs font-bold text-primary bg-primary/10 px-4 py-2 rounded-xl hover:bg-primary/20 transition-all active:scale-95'
                                     >
-                                        Reset Filters
+                                        {t('specialistFinder.resetFilters')}
                                     </button>
                                 </div>
                             )}
@@ -437,7 +441,7 @@ const SpecialistFinder = () => {
                                     onClick={handlePrevStep}
                                     className='text-sm font-bold text-gray-400 hover:text-gray-600 transition-colors active:scale-95'
                                 >
-                                    ← Back
+                                    {t('specialistFinder.back')}
                                 </button>
 
                                 <button
@@ -445,7 +449,7 @@ const SpecialistFinder = () => {
                                     onClick={resetFinder}
                                     className='text-sm font-bold text-primary hover:text-primary-dark transition-colors active:scale-95'
                                 >
-                                    Start New Search
+                                    {t('specialistFinder.startNewSearch')}
                                 </button>
                             </div>
                         </div>

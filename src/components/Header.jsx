@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react'
 import { assets } from '../assets/assets'
+import { useTranslation } from 'react-i18next'
 
 const InteractiveHeaderCanvas = () => {
     const canvasRef = useRef(null);
@@ -114,6 +115,8 @@ const InteractiveHeaderCanvas = () => {
 };
 
 const Header = () => {
+    const { t } = useTranslation()
+
     return (
         <div className='relative flex flex-col md:flex-row items-center bg-primary rounded-[2rem] px-8 md:px-16 lg:px-20 py-14 md:py-18 overflow-hidden shadow-lg animate-fade-in-up mt-6'>
 
@@ -126,13 +129,13 @@ const Header = () => {
                 
                 <div className="inline-flex items-center gap-2 bg-white/10 px-3.5 py-1.5 rounded-full">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-300 animate-pulse-ring"></span>
-                    <span className="text-white/80 text-[10px] uppercase tracking-widest font-semibold">Book with confidence</span>
+                    <span className="text-white/80 text-[10px] uppercase tracking-widest font-semibold">{t('header.bookWithConfidence')}</span>
                 </div>
 
                 <h1 className='text-4xl md:text-5xl lg:text-[3.5rem] text-white font-display font-extrabold leading-[1.1] tracking-tight'>
-                    Book Appointment <br />
+                    {t('header.bookAppointment')} <br />
                     <span className='text-blue-100 relative'>
-                        With Trusted Doctors
+                        {t('header.withTrustedDoctors')}
                         <svg className="absolute left-0 bottom-[-8px] w-full h-2.5 text-white/25" viewBox="0 0 300 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M3 9C60 3.5 180 3.5 297 7.5" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
                         </svg>
@@ -142,7 +145,7 @@ const Header = () => {
                 <div className='flex flex-col sm:flex-row items-start sm:items-center gap-4 text-white/80 max-w-lg mt-1'>
                     <img className='w-24 drop-shadow-lg hover:scale-105 transition-transform duration-300' src={assets.group_profiles} alt="Trusted Doctors" />
                     <p className='leading-relaxed text-sm font-medium text-white/85'>
-                        Explore our network of certified professionals. Pick a slot, connect, and secure your session.
+                        {t('header.exploreNetwork')}
                     </p>
                 </div>
 
@@ -150,8 +153,8 @@ const Header = () => {
                     href='#speciality'
                     className='flex items-center gap-3 bg-white px-8 py-4 rounded-xl text-primary font-bold text-sm hover:bg-white/95 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 shadow-lg group'
                 >
-                    Book appointment
-                    <img className='w-3 group-hover:translate-x-1 transition-transform' src={assets.arrow_icon} alt="Arrow" />
+                    {t('header.bookNow')}
+                    <img className='w-3 rtl:scale-x-flip group-hover:translate-x-1 group-hover:-translate-x-1 transition-transform' src={assets.arrow_icon} alt="Arrow" />
                 </a>
             </div>
 

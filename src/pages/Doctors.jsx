@@ -1,9 +1,11 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AppContext } from "../context/AppContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { specialityData } from "../assets/assets";
 
 const Doctors = () => {
+  const { t } = useTranslation();
   const { speciality } = useParams();
   const navigate = useNavigate();
   const { doctors, currencySymbol, getDoctosData } = useContext(AppContext);
@@ -48,10 +50,10 @@ const Doctors = () => {
       <div className="flex flex-col gap-5 pt-10 pb-8">
         <div>
           <h1 className="text-3xl sm:text-4xl font-display font-extrabold text-text tracking-tight">
-            Find Your <span className="text-primary">Specialist</span>
+            {t('doctors.findYourSpecialist')} <span className="text-primary">{t('doctors.specialist')}</span>
           </h1>
           <p className="text-text-secondary text-sm mt-1.5 font-medium">
-            Search our directory of certified health professionals and schedule seamlessly.
+            {t('doctors.searchDirectory')}
           </p>
         </div>
 
@@ -59,19 +61,19 @@ const Doctors = () => {
           <input
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Doctor name or keyword..."
+            placeholder={t('doctors.doctorNamePlaceholder')}
             className="xl:col-span-2 text-sm bg-surface-raised rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all font-medium border border-border-light"
           />
           <input
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            placeholder="Location/City"
+            placeholder={t('doctors.locationPlaceholder')}
             className="text-sm bg-surface-raised rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all font-medium border border-border-light"
           />
           <input
             value={maxFees}
             onChange={(e) => setMaxFees(e.target.value)}
-            placeholder="Max Fees"
+            placeholder={t('doctors.maxFees')}
             type="number"
             min="0"
             className="text-sm bg-surface-raised rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all font-medium border border-border-light"
@@ -81,7 +83,7 @@ const Doctors = () => {
             onChange={(e) => setMinRating(e.target.value)}
             className="text-sm bg-surface-raised text-text-secondary rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all font-medium border border-border-light cursor-pointer"
           >
-            <option value="">Min Rating</option>
+            <option value="">{t('doctors.minRating')}</option>
             <option value="1">&#9733; 1+</option>
             <option value="2">&#9733; 2+</option>
             <option value="3">&#9733; 3+</option>
@@ -92,10 +94,10 @@ const Doctors = () => {
             onChange={(e) => setSortOption(e.target.value)}
             className="text-sm bg-surface-raised text-text-secondary rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all font-medium border border-border-light cursor-pointer"
           >
-            <option value="default">Sort by</option>
-            <option value="rating_desc">High Rating</option>
-            <option value="fees_asc">Lowest Fees</option>
-            <option value="experience_desc">Experience</option>
+            <option value="default">{t('doctors.sortBy')}</option>
+            <option value="rating_desc">{t('doctors.highRating')}</option>
+            <option value="fees_asc">{t('doctors.lowestFees')}</option>
+            <option value="experience_desc">{t('doctors.experience')}</option>
           </select>
         </div>
 
@@ -107,7 +109,7 @@ const Doctors = () => {
               onChange={(e) => setAvailableOnly(e.target.checked)}
               className="w-4 h-4 rounded border-border text-primary focus:ring-primary cursor-pointer"
             />
-            <span className="group-hover:text-primary transition-colors">Show Available Only</span>
+            <span className="group-hover:text-primary transition-colors">{t('doctors.showAvailableOnly')}</span>
           </label>
         </div>
       </div>
@@ -119,7 +121,7 @@ const Doctors = () => {
             showFilter ? "bg-primary text-white shadow-md" : "bg-white text-text-secondary shadow-sm border border-border-light"
           }`}
         >
-          Specialty Filters
+          {t('doctors.specialtyFilters')}
           <span>{showFilter ? "\u2715" : "\u2630"}</span>
         </button>
 
@@ -133,7 +135,7 @@ const Doctors = () => {
                 : "bg-surface-raised text-text-secondary hover:bg-border-light hover:text-text"
             }`}
           >
-            All Specialties
+            {t('doctors.allSpecialties')}
           </button>
           <div className="h-px bg-border-light my-1.5"></div>
           {specialityData.map((item) => (
@@ -174,7 +176,7 @@ const Doctors = () => {
                     <div className="absolute top-3 left-3 px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 bg-white shadow-sm">
                       <span className={`w-1.5 h-1.5 rounded-full ${item.available ? "bg-green-500" : "bg-gray-400"}`}></span>
                       <span className={item.available ? "text-green-700" : "text-text-muted"}>
-                        {item.available ? "Available" : "Busy"}
+                        {item.available ? t('doctors.available') : t('doctors.busy')}
                       </span>
                     </div>
                   </div>
@@ -182,7 +184,7 @@ const Doctors = () => {
                   <div className="p-4">
                     <p className="text-text-muted text-xs font-semibold uppercase tracking-wider mb-0.5">{item.specialization || item.speciality}</p>
                     <p className="text-text text-base font-bold line-clamp-1">{docName}</p>
-                    <p className="text-text-secondary text-sm mt-0.5 font-medium">{item.city || item.address?.line1 || item.address || "Location not listed"}</p>
+                    <p className="text-text-secondary text-sm mt-0.5 font-medium">{item.city || item.address?.line1 || item.address || t('doctors.locationNotListed')}</p>
                     
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-border-light">
                       <div className="flex items-center gap-1">
@@ -200,7 +202,7 @@ const Doctors = () => {
           ) : (
             <div className="col-span-full py-20 text-center flex flex-col items-center gap-4 bg-surface-raised rounded-2xl border-2 border-dashed border-border">
               <div className="w-14 h-14 bg-border-light rounded-full flex items-center justify-center text-2xl">?</div>
-              <p className="text-text-secondary font-semibold">No doctors match the selected filters.</p>
+              <p className="text-text-secondary font-semibold">{t('doctors.noDoctorsMatch')}</p>
               <button
                 onClick={() => {
                   setSearchTerm("");
@@ -213,7 +215,7 @@ const Doctors = () => {
                 }}
                 className="text-primary font-semibold hover:underline text-sm"
               >
-                Reset filters
+                {t('doctors.resetFilters')}
               </button>
             </div>
           )}

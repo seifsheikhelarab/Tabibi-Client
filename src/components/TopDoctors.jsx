@@ -1,9 +1,11 @@
 import React, { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AppContext } from '../context/AppContext'
 import { assets } from '../assets/assets'
 
 const TopDoctors = () => {
+    const { t } = useTranslation()
     const navigate = useNavigate()
     const { doctors } = useContext(AppContext)
     const doctorList = Array.isArray(doctors) ? doctors : []
@@ -17,8 +19,8 @@ const TopDoctors = () => {
 
     return (
         <div className='flex flex-col items-center gap-4 my-16 text-text animate-fade-in-up'>
-            <h2 className='text-3xl font-display font-extrabold text-text tracking-tight'>Top Doctors to Book</h2>
-            <p className='sm:w-1/3 text-center text-sm text-text-secondary font-medium'>Simply browse through our extensive list of trusted doctors.</p>
+            <h2 className='text-3xl font-display font-extrabold text-text tracking-tight'>{t('topDoctors.topDoctors')}</h2>
+            <p className='sm:w-1/3 text-center text-sm text-text-secondary font-medium'>{t('topDoctors.browseList')}</p>
             <div className='w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 pt-5'>
                 {doctorList.slice(0, 8).map((item, index) => {
                     const docId = getDoctorId(item);
@@ -64,7 +66,7 @@ const TopDoctors = () => {
                 onClick={() => { navigate('/doctors'); scrollTo(0, 0) }} 
                 className='bg-primary/5 text-primary hover:bg-primary hover:text-white px-10 py-3.5 rounded-xl mt-8 transition-all duration-300 font-semibold text-sm active:scale-[0.97]'
             >
-                View all doctors
+                {t('topDoctors.viewAllDoctors')}
             </button>
         </div>
     )

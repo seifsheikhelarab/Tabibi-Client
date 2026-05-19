@@ -1,16 +1,18 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { specialityData } from '../assets/assets'
 import { Link, useNavigate } from 'react-router-dom'
 
 const SpecialityMenu = () => {
+    const { t } = useTranslation()
     const navigate = useNavigate()
 
     return (
         <div id='speciality' className='flex flex-col items-center gap-6 py-20 text-text'>
             <div className='text-center max-w-xl mx-auto'>
-                <h2 className='text-3xl sm:text-4xl font-display font-extrabold text-text tracking-tight'>Find by Speciality</h2>
+                <h2 className='text-3xl sm:text-4xl font-display font-extrabold text-text tracking-tight'>{t('specialityMenu.findBySpeciality')}</h2>
                 <p className='text-sm text-text-secondary mt-2 font-medium leading-relaxed'>
-                    Browse through our list of trusted doctors, or try our matching tool to find the perfect specialist for your symptoms.
+                    {t('specialityMenu.browseList')}
                 </p>
             </div>
 
@@ -28,10 +30,10 @@ const SpecialityMenu = () => {
             <div className='w-full max-w-4xl mx-auto mt-6 px-4'>
                 <div className='bg-primary/[0.03] border border-primary/10 rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6'>
                     <div className='max-w-lg text-center md:text-left'>
-                        <span className='text-[10px] font-bold text-primary bg-primary/10 px-3 py-1 rounded-full uppercase tracking-wider'>Guided Matching</span>
-                        <h3 className='text-lg font-display font-extrabold text-text mt-2'>Not sure which doctor is right for you?</h3>
+                        <span className='text-[10px] font-bold text-primary bg-primary/10 px-3 py-1 rounded-full uppercase tracking-wider'>{t('specialityMenu.guidedMatching')}</span>
+                        <h3 className='text-lg font-display font-extrabold text-text mt-2'>{t('specialityMenu.notSureWhichDoctor')}</h3>
                         <p className='text-text-secondary text-xs mt-1 font-medium leading-normal'>
-                            Use our guided multi-step finder to filter by specific symptoms, availability, rating, and fee preferences in under 30 seconds.
+                            {t('specialityMenu.useGuidedFinder')}
                         </p>
                     </div>
                     <button 
@@ -41,7 +43,7 @@ const SpecialityMenu = () => {
                         }}
                         className='bg-primary text-white font-bold text-xs px-6 py-3.5 rounded-xl hover:shadow-lg hover:shadow-primary/20 transition-all whitespace-nowrap active:scale-[0.97]'
                     >
-                        Try Specialist Finder &rarr;
+                        {t('specialityMenu.trySpecialistFinder')}
                     </button>
                 </div>
             </div>

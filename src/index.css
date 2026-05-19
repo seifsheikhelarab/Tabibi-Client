@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Figtree:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Figtree:wght@400;500;600;700&family=Cairo:wght@400;500;600;700;800;900&family=Noto+Kufi+Arabic:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -20,6 +20,8 @@
 
   --font-display: 'Sora', sans-serif;
   --font-body: 'Figtree', sans-serif;
+  --font-display-arabic: 'Cairo', 'Noto Kufi Arabic', sans-serif;
+  --font-body-arabic: 'Cairo', 'Noto Kufi Arabic', sans-serif;
 }
 
 * {
@@ -28,6 +30,22 @@
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
+}
+
+/* RTL Arabic font overrides */
+.rtl-layout,
+[dir="rtl"] {
+  --font-display: var(--font-display-arabic);
+  --font-body: var(--font-body-arabic);
+}
+
+.rtl-layout h1, .rtl-layout h2, .rtl-layout h3, .rtl-layout h4, .rtl-layout h5, .rtl-layout h6,
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6 {
+  font-family: var(--font-display-arabic);
+}
+
+.rtl-layout .font-display {
+  font-family: var(--font-display-arabic) !important;
 }
 
 ::-webkit-scrollbar {
@@ -80,4 +98,27 @@ h1, h2, h3, h4, h5, h6 {
 
 .grid-cols-auto {
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+/* RTL-specific utility classes for margins, paddings, and transforms */
+[dir="rtl"] .rtl\:scale-x-flip {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .rtl\:text-left {
+  text-align: right !important;
+}
+
+[dir="rtl"] .rtl\:text-right {
+  text-align: left !important;
+}
+
+[dir="rtl"] .rtl\:flex-row-reverse {
+  flex-direction: row-reverse !important;
+}
+
+/* Smooth language transition */
+.rtl-layout,
+.ltr-layout {
+  transition: all 0.15s ease-out;
 }

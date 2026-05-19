@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { chatbotApi } from '../api/client';
 
 // Organic calming breathing visualization component
@@ -83,9 +84,10 @@ const BreathingCanvas = () => {
 };
 
 const Chatbot = () => {
+    const { t } = useTranslation()
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
-        { role: 'ai', text: 'Hello! I am your Tabibi assistant. Describe your symptoms, and I will recommend a specialist for you.' }
+        { role: 'ai', text: t('chatbot.greeting') }
     ]);
     const [input, setInput] = useState('');
     const [image, setImage] = useState(null);
@@ -141,7 +143,7 @@ const Chatbot = () => {
                 image: image
             });
 
-            const reply = response.data?.reply || response.data?.response || response.reply || response.message || "I'm sorry, I couldn't get a response.";
+            const reply = response.data?.reply || response.data?.response || response.reply || response.message || t('chatbot.sorryNoResponse');
             const doctors = response.data?.doctors || response.doctors || [];
 
             setMessages(prev => [...prev, {
@@ -151,8 +153,8 @@ const Chatbot = () => {
             }]);
         } catch (error) {
             console.error(error);
-            toast.error("Failed to connect to assistant.");
-            setMessages(prev => [...prev, { role: 'ai', text: "Network error. Please make sure the backend is running." }]);
+            toast.error(t('chatbot.failedToConnect'));
+            setMessages(prev => [...prev, { role: 'ai', text: t('chatbot.networkError') }]);
         } finally {
             setIsLoading(false);
         }
@@ -187,10 +189,10 @@ const Chatbot = () => {
                             <div className='absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-primary rounded-full animate-pulse-ring'></div>
                         </div>
                         <div>
-                            <h3 className="font-bold text-lg tracking-tight">Tabibi Calming AI</h3>
+                            <h3 className="font-bold text-lg tracking-tight">{t('chatbot.tabibiCalmingAI')}</h3>
                             <div className='flex items-center gap-1.5'>
                                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-                                <p className='text-[10px] text-white/90 uppercase font-bold tracking-wider'>Breathe &amp; Connect</p>
+                                <p className='text-[10px] text-white/90 uppercase font-bold tracking-wider'>{t('chatbot.breatheAndConnect')}</p>
                             </div>
                         </div>
                     </div>
@@ -239,10 +241,9 @@ const Chatbot = () => {
                                                     <div className='absolute -bottom-0.5 -right-0.5 bg-green-400 w-4 h-4 rounded-full border-2 border-white shadow-sm'></div>
                                                 </div>
                                                 <p className="text-xs font-bold text-gray-900 group-hover:text-primary transition-colors text-center z-10 line-clamp-1">{doctorName}</p>
-                                                <p className="text-[10px] text-gray-500 mb-4 font-medium z-10">{doc.speciality || doc.specialization}</p>
-                                                <button className='w-full text-[10px] bg-gray-50 text-primary py-2.5 rounded-xl font-bold group-hover:bg-primary group-hover:text-white transition-all shadow-sm z-10 active:scale-95'>
-                                                    Book Slot
-                                                </button>
+                                                <p className="text-[10px] text-gray-500 mb-4 font-medium z-10">{doc.speciality || doc.specialization}</p>                                                    <button className='w-full text-[10px] bg-gray-50 text-primary py-2.5 rounded-xl font-bold group-hover:bg-primary group-hover:text-white transition-all shadow-sm z-10 active:scale-95'>
+                                                        {t('chatbot.bookSlot')}
+                                                    </button>
                                             </div>
                                         );
                                     })}
@@ -283,7 +284,7 @@ const Chatbot = () => {
                         <button
                             onClick={() => fileInputRef.current.click()}
                             className="p-2 rounded-xl transition-all text-gray-400 hover:text-primary hover:bg-primary/5 group"
-                            title="Upload Medical Report/Image"
+                            title={t('chatbot.uploadMedicalReport')}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="currentColor" className="w-5 h-5 transition-transform group-hover:scale-105">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94a3 3 0 114.243 4.243L8.767 17.45a1.5 1.5 0 01-2.121-2.121l10.191-10.191m-4.722 9.91l-3.322 3.322" />
@@ -294,7 +295,7 @@ const Chatbot = () => {
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyPress={handleKeyPress}
-                            placeholder={image ? "Describe this image..." : "How can I help you today?"}
+                            placeholder={image ? t('chatbot.describeImage') : t('chatbot.howCanIHelp')}
                             className="flex-1 bg-transparent px-2 py-2 outline-none text-sm text-text font-medium placeholder:text-text-muted"
                         />
                         <button

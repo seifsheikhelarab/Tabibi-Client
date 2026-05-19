@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
 import { assets } from "../assets/assets";
@@ -19,12 +20,12 @@ const paymentStatusColorMap = {
 };
 
 const MyAppointments = () => {
+    const { t } = useTranslation();
     const { patientAppointments, loadPatientAppointments, currencySymbol } = useContext(AppContext);
     const [paymentId, setPaymentId] = useState("");
     const [uploading, setUploading] = useState(false);
     
-    // Cancellation state
-    const [cancellationTarget, setCancellationTarget] = useState(null); // appointmentId or null
+    const [cancellationTarget, setCancellationTarget] = useState(null);
     const [isCancelling, setIsCancelling] = useState(false);
 
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -43,7 +44,7 @@ const MyAppointments = () => {
         try {
             setIsCancelling(true);
             await appointmentsApi.cancel(cancellationTarget);
-            toast.success('Appointment cancelled successfully');
+            toast.success(t('myAppointments.appointmentCancelled'));
             setCancellationTarget(null);
             loadPatientAppointments();
         } catch (error) {
@@ -56,7 +57,7 @@ const MyAppointments = () => {
     const appointmentCash = async (appointmentId) => {
         try {
             await appointmentsApi.update(appointmentId, { paymentMethod: 'CASH' });
-            toast.success('Cash payment selected');
+            toast.success(t('myAppointments.cashPaymentSelected'));
             loadPatientAppointments();
             setPaymentId("");
         } catch (error) {
@@ -71,7 +72,7 @@ const MyAppointments = () => {
                 doctorId,
                 rating
             });
-            toast.success('Rating submitted');
+            toast.success(t('myAppointments.ratingSubmitted'));
             loadPatientAppointments();
         } catch (error) {
             toast.error(error.message);
@@ -80,10 +81,10 @@ const MyAppointments = () => {
 
     const appointmentInstapay = async (appointmentId, image) => {
         try {
-            if (!image) return toast.error("Please upload payment image");
+            if (!image) return toast.error(t('myAppointments.pleaseUploadPaymentImage'));
             
             setUploading(true);
-            toast.info("Uploading payment proof...");
+            toast.info(t('myAppointments.uploadPaymentProof'));
             
             const { data } = await uploadApi.uploadImage(image);
             const imageUrl = data.url;
@@ -93,11 +94,11 @@ const MyAppointments = () => {
                 paymentMethod: 'INSTAPAY'
             });
             
-            toast.success("Payment proof submitted! Waiting for verification.");
+            toast.success(t('myAppointments.paymentProofSubmitted'));
             loadPatientAppointments();
             setPaymentId("");
         } catch (error) {
-            toast.error(error.message || "Failed to upload payment proof");
+            toast.error(error.message || t('myAppointments.uploadFailed'));
         } finally {
             setUploading(false);
         }
@@ -112,13 +113,13 @@ const MyAppointments = () => {
             <div className="flex flex-col md:flex-row md:items-end justify-between mt-12 mb-10 gap-4">
                 <div>
                     <span className="text-xs font-semibold text-primary uppercase tracking-widest bg-primary/5 px-4 py-1.5 rounded-full inline-block mb-3">
-                        Patient Workspace
+                        {t('myAppointments.patientWorkspace')}
                     </span>
                     <h1 className="text-3xl sm:text-4xl font-display font-extrabold text-text tracking-tight">
-                        My Appointments
+                        {t('myAppointments.myAppointments')}
                     </h1>
                     <p className="text-text-secondary text-sm mt-2 font-medium">
-                        View and manage your upcoming schedule, process payments, and share doctor session feedback.
+                        {t('myAppointments.viewAndManage')}
                     </p>
                 </div>
             </div>
@@ -135,9 +136,9 @@ const MyAppointments = () => {
                         </svg>
                     </div>
                     <div>
-                        <h3 className="text-lg font-display font-bold text-text tracking-tight">Your wellness schedule is clear</h3>
+                        <h3 className="text-lg font-display font-bold text-text tracking-tight">{t('myAppointments.yourWellnessScheduleClear')}</h3>
                         <p className="text-text-secondary text-sm mt-2 max-w-sm leading-relaxed mx-auto font-medium">
-                            Take this moment to rest, take a deep breath, and enjoy the day. When you need us, your caretakers will be right here.
+                            {t('myAppointments.takeThisMoment')}
                         </p>
                     </div>
                 </div>
@@ -148,7 +149,7 @@ const MyAppointments = () => {
                         .map((item, index) => {
                             const doctorName = item.doctor 
                                 ? `${item.doctor.firstName} ${item.doctor.lastName}`.trim()
-                                : 'Doctor';
+                                : t('common.doctor');
                             const avgRating = item.doctor?.numRatings > 0 ? item.doctor.rating / item.doctor.numRatings : 0;
                             
                             return (
@@ -167,10 +168,10 @@ const MyAppointments = () => {
                                                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                                                     <div>
                                                         <h3 className="text-xl font-display font-extrabold text-text leading-tight">{doctorName}</h3>
-                                                        <p className="text-text-muted text-xs font-semibold uppercase tracking-wider mt-1">{item.doctor?.specialization || 'General'}</p>
+                                                        <p className="text-text-muted text-xs font-semibold uppercase tracking-wider mt-1">{item.doctor?.specialization || t('common.general')}</p>
                                                     </div>
                                                     <span className={`px-4 py-1.5 rounded-full text-xs font-bold border self-center sm:self-start ${statusColorMap[item.status] || "bg-gray-50 text-gray-600 border-gray-300"}`}>
-                                                        {item.status || "PENDING"}
+                                                        {item.status || t('common.loading')}
                                                     </span>
                                                 </div>
 
@@ -189,7 +190,7 @@ const MyAppointments = () => {
                                                     </p>
                                                     <p className="flex items-center gap-1.5 bg-surface-raised px-3 py-1.5 rounded-xl border border-border-light">
                                                         <span className="text-amber font-bold">&#9733;</span>
-                                                        <span className="text-text-secondary">{avgRating > 0 ? avgRating.toFixed(1) : 'New'} Rating</span>
+                                                        <span className="text-text-secondary">{avgRating > 0 ? avgRating.toFixed(1) : t('common.new')} {t('doctors.rating')}</span>
                                                     </p>
                                                 </div>
                                             </div>
@@ -198,23 +199,22 @@ const MyAppointments = () => {
                                                 <div className="flex flex-wrap items-center gap-2">
                                                     {item.paymentStatus && (
                                                         <span className={`px-3 py-1 rounded-xl text-xs font-bold border ${paymentStatusColorMap[item.paymentStatus] || "bg-gray-50 text-gray-600 border-gray-300"}`}>
-                                                            Payment: {item.paymentStatus}
+                                                            {t('myAppointments.payment')} {item.paymentStatus}
                                                         </span>
                                                     )}
                                                     <span className="text-xs font-bold text-text bg-surface-raised px-3 py-1 rounded-xl border border-border-light">
-                                                        Fee: {currencySymbol} {item.fees}
+                                                        {t('myAppointments.fee')} {currencySymbol} {item.fees}
                                                     </span>
                                                 </div>
 
                                                 <div className="flex flex-wrap items-center gap-2">
-                                                    {/* Actions with tactile micro-interactions */}
                                                     {item.status !== 'CANCELLED' && item.status !== 'COMPLETED' && item.paymentStatus === 'PENDING' && paymentId !== item.id && (
                                                         <button 
                                                             type="button"
                                                             onClick={() => setPaymentId(item.id)} 
                                                             className="px-4 py-2 border border-gray-200 rounded-xl text-xs font-bold text-gray-700 hover:border-primary hover:text-primary transition-all active:scale-95 duration-200"
                                                         >
-                                                            Pay Online
+                                                            {t('myAppointments.payOnline')}
                                                         </button>
                                                     )}
 
@@ -231,29 +231,29 @@ const MyAppointments = () => {
                                                                 onClick={() => appointmentCash(item.id)} 
                                                                 className="px-4 py-2 border border-gray-200 rounded-xl text-xs font-bold text-gray-700 hover:border-primary hover:text-primary transition-all active:scale-95 duration-200"
                                                             >
-                                                                Cash Method
+                                                                {t('myAppointments.cashMethod')}
                                                             </button>
                                                             <button 
                                                                 type="button"
                                                                 onClick={() => setPaymentId("")} 
                                                                 className="px-3 py-2 text-xs font-semibold text-gray-400 hover:text-gray-600 transition-colors"
                                                             >
-                                                                Cancel
+                                                                {t('myAppointments.cancel')}
                                                             </button>
                                                         </div>
                                                     )}
 
                                                     {item.paymentStatus === 'VERIFYING' && (
-                                                        <button type="button" className="px-4 py-2 border border-orange-200 rounded-xl text-xs font-bold text-orange-700 bg-orange-50/50 cursor-default">Verifying Payment...</button>
+                                                        <button type="button" className="px-4 py-2 border border-orange-200 rounded-xl text-xs font-bold text-orange-700 bg-orange-50/50 cursor-default">{t('myAppointments.verifyingPayment')}</button>
                                                     )}
 
                                                     {item.paymentStatus === 'PAID' && item.status !== 'COMPLETED' && (
-                                                        <button type="button" className="px-4 py-2 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-700 bg-emerald-50/50 cursor-default">Paid</button>
+                                                        <button type="button" className="px-4 py-2 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-700 bg-emerald-50/50 cursor-default">{t('myAppointments.paid')}</button>
                                                     )}
 
                                                     {item.status === 'COMPLETED' && !item.rating && (
                                                         <div className="flex items-center gap-2.5 bg-gray-50/50 border border-gray-100 px-3 py-1.5 rounded-xl">
-                                                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Rate Doctor:</span>
+                                                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{t('myAppointments.rateDoctor')}</span>
                                                             <div className="flex gap-1">
                                                                 {[1, 2, 3, 4, 5].map((star) => (
                                                                     <button
@@ -270,7 +270,7 @@ const MyAppointments = () => {
                                                     )}
 
                                                     {item.status === 'COMPLETED' && item.rating && (
-                                                        <span className="px-4 py-2 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-700 bg-emerald-50/50">Completed</span>
+                                                        <span className="px-4 py-2 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-700 bg-emerald-50/50">{t('myAppointments.completed')}</span>
                                                     )}
 
                                                     {item.status !== 'CANCELLED' && item.status !== 'COMPLETED' && (
@@ -279,12 +279,12 @@ const MyAppointments = () => {
                                                             onClick={() => handleCancelRequest(item.id)} 
                                                             className="px-4 py-2 border border-gray-100 rounded-xl text-xs font-bold text-gray-400 hover:border-rose-200 hover:text-rose-600 transition-all active:scale-95 duration-200 sm:ml-auto"
                                                         >
-                                                            Cancel Appointment
+                                                            {t('myAppointments.cancelAppointment')}
                                                         </button>
                                                     )}
                                                     
                                                     {item.status === 'CANCELLED' && (
-                                                        <span className="px-4 py-2 border border-rose-200 rounded-xl text-xs font-bold text-rose-700 bg-rose-50/50">Cancelled</span>
+                                                        <span className="px-4 py-2 border border-rose-200 rounded-xl text-xs font-bold text-rose-700 bg-rose-50/50">{t('myAppointments.cancelled')}</span>
                                                     )}
                                                 </div>
                                             </div>
@@ -296,7 +296,7 @@ const MyAppointments = () => {
                 </div>
             )}
 
-            {/* Premium Calming Cancellation Confirmation Modal */}
+            {/* Cancellation Confirmation Modal */}
             {cancellationTarget && (
                 <div className="fixed inset-0 bg-gray-900/40 flex items-center justify-center p-4 z-50 animate-fade-in-up">
                     <div className="bg-white max-w-md w-full rounded-2xl p-6 md:p-8 border border-border-light shadow-xl animate-fade-in-up">
@@ -306,9 +306,9 @@ const MyAppointments = () => {
                             </svg>
                         </div>
                         
-                        <h3 className="text-xl font-display font-bold text-text leading-tight">Cancel your appointment?</h3>
+                        <h3 className="text-xl font-display font-bold text-text leading-tight">{t('myAppointments.cancelYourAppointment')}</h3>
                         <p className="text-text-secondary text-sm mt-3 leading-relaxed font-medium">
-                            Are you sure you want to cancel this scheduled session? This action cannot be undone, and your slot will immediately be made available to other patients waiting for care.
+                            {t('myAppointments.cancelConfirmMsg')}
                         </p>
                         
                         <div className="flex items-center gap-3 mt-8 pt-6 border-t border-border-light">
@@ -318,7 +318,7 @@ const MyAppointments = () => {
                                 onClick={() => setCancellationTarget(null)}
                                 className="flex-1 py-3 border border-border hover:bg-surface-raised rounded-xl text-xs font-semibold text-text-secondary transition-all active:scale-[0.97] duration-200"
                             >
-                                Keep Appointment
+                                {t('myAppointments.keepAppointment')}
                             </button>
                             <button
                                 type="button"
@@ -326,7 +326,7 @@ const MyAppointments = () => {
                                 onClick={confirmCancelAppointment}
                                 className="flex-1 py-3 bg-rose hover:opacity-90 text-white rounded-xl text-xs font-semibold transition-all shadow-sm active:scale-[0.97] duration-200"
                             >
-                                {isCancelling ? 'Cancelling...' : 'Confirm Cancel'}
+                                {isCancelling ? t('myAppointments.cancelling') : t('myAppointments.confirmCancel')}
                             </button>
                         </div>
                     </div>

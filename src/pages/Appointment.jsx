@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AppContext } from '../context/AppContext'
 import { assets } from '../assets/assets'
 import RelatedDoctors from '../components/RelatedDoctors'
@@ -62,6 +63,7 @@ const CalmingCardBackground = () => {
 };
 
 const Appointment = () => {
+    const { t } = useTranslation()
     const { docId } = useParams()
     const { doctors, currencySymbol, patientData, getDoctosData, loadPatientAppointments } = useContext(AppContext)
     const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
@@ -156,17 +158,17 @@ const Appointment = () => {
 
     const bookAppointment = async () => {
         if (!patientData) {
-            toast.warning('Please complete your profile first')
+            toast.warning(t('appointment.pleaseCompleteProfile'))
             return navigate('/my-profile')
         }
 
         if (!docSlots[slotIndex] || docSlots[slotIndex].length === 0) {
-            return toast.error('No available slots for this day')
+            return toast.error(t('appointment.noAvailableSlots'))
         }
 
         const selectedSlot = docSlots[slotIndex].find(s => s.time === slotTime)
         if (!selectedSlot) {
-            return toast.warning('Please select a booking time')
+            return toast.warning(t('appointment.pleaseSelectTime'))
         }
 
         try {
@@ -217,7 +219,7 @@ const Appointment = () => {
     // Calming breathing guide cycle sync
     useEffect(() => {
         if (!isBooking || bookingSuccess) return;
-        const stages = ['Inhale peace...', 'Hold calmly...', 'Exhale anxiety...', 'Hold calmly...'];
+        const stages = [t('appointment.inhalePeace'), t('appointment.holdCalmly'), t('appointment.exhaleAnxiety'), t('appointment.holdCalmly')];
         let idx = 0;
         const interval = setInterval(() => {
             idx = (idx + 1) % stages.length;
@@ -250,7 +252,7 @@ const Appointment = () => {
                         <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 bg-white shadow-sm">
                             <span className={`w-1.5 h-1.5 rounded-full ${docInfo.available ? "bg-green-500" : "bg-gray-400"}`}></span>
                             <span className={docInfo.available ? "text-green-700 font-bold" : "text-text-muted font-bold"}>
-                                {docInfo.available ? "Active" : "Busy"}
+                                {docInfo.available ? t('appointment.active') : t('appointment.busy')}
                             </span>
                         </div>
                     </div>
@@ -258,7 +260,7 @@ const Appointment = () => {
                     <div className='flex-1 w-full text-center md:text-left'>
                         <div className='flex flex-col md:flex-row items-center gap-3 justify-center md:justify-start'>
                             <h1 className='text-3xl font-display font-extrabold text-text tracking-tight'>{doctorName}</h1>
-                            <img className='w-5' src={assets.verified_icon} alt="Verified badge" />
+                            <img className='w-5' src={assets.verified_icon} alt={t('appointment.verifiedBadge')} />
                         </div>
                         
                         <div className='flex flex-wrap items-center justify-center md:justify-start gap-2.5 mt-3.5 text-text-secondary font-medium text-sm'>
@@ -266,22 +268,22 @@ const Appointment = () => {
                             <span className='text-border hidden sm:inline'>&bull;</span>
                             <span>{docInfo.specialization || docInfo.speciality}</span>
                             <span className='text-border hidden sm:inline'>&bull;</span>
-                            <span className='px-3 py-1 bg-primary/5 text-primary rounded-xl text-xs font-bold'>{docInfo.experience} Years Exp.</span>
+                            <span className='px-3 py-1 bg-primary/5 text-primary rounded-xl text-xs font-bold'>{docInfo.experience} {t('doctors.yearsExp')}</span>
                         </div>
 
                         <div className='flex items-center justify-center md:justify-start gap-1.5 mt-4'>
                             <span className='text-amber text-lg'>&#9733;</span>
                             <span className='font-bold text-text text-base'>{avgRating.toFixed(1)}</span>
-                            <span className='text-text-muted text-xs font-medium'>({docInfo.numRatings || 0} trusted reviews)</span>
+                            <span className='text-text-muted text-xs font-medium'>({docInfo.numRatings || 0} {t('doctors.trustedReviews')})</span>
                         </div>
 
                         <div className='mt-6 bg-white p-5 rounded-2xl border border-border-light text-left'>
-                            <h3 className='text-xs font-bold text-text-muted uppercase tracking-widest mb-2.5'>Professional Background</h3>
+                            <h3 className='text-xs font-bold text-text-muted uppercase tracking-widest mb-2.5'>{t('appointment.professionalBackground')}</h3>
                             <p className='text-text-secondary text-sm leading-relaxed font-medium'>{docInfo.about}</p>
                         </div>
 
                         <div className='mt-6 pt-5 border-t border-gray-100 flex items-center justify-between'>
-                            <span className='text-gray-400 font-bold text-sm uppercase tracking-wider'>Session Booking Fee:</span>
+                            <span className='text-gray-400 font-bold text-sm uppercase tracking-wider'>{t('appointment.sessionBookingFee')}</span>
                             <span className='text-3xl font-extrabold text-gray-900'>{currencySymbol}{docInfo.fees}</span>
                         </div>
                     </div>
@@ -292,7 +294,7 @@ const Appointment = () => {
             <div className='mt-10 bg-white rounded-2xl p-6 sm:p-8 border border-border-light shadow-sm'>
                 <h2 className='text-xl font-display font-extrabold text-text mb-5 tracking-tight flex items-center gap-2'>
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse-ring"></span>
-                    Select a Booking Date
+                    {t('appointment.selectBookingDate')}
                 </h2>
                 
                 <div className='flex gap-3 overflow-x-auto pb-3.5 pt-1.5 scroll-smooth no-scrollbar'>
@@ -323,7 +325,7 @@ const Appointment = () => {
                     <>
                         <h2 className='text-xl font-display font-extrabold text-text mt-8 mb-5 tracking-tight flex items-center gap-2'>
                             <span className="w-2 h-2 rounded-full bg-green"></span>
-                            Available Consultation Slots
+                            {t('appointment.availableConsultationSlots')}
                         </h2>
                         
                         <div className='flex flex-wrap gap-2.5'>
@@ -345,7 +347,7 @@ const Appointment = () => {
                     </>
                 ) : (
                     <div className="py-8 text-center bg-gray-50 rounded-2xl mt-6 border-2 border-dashed border-gray-150">
-                        <p className='text-gray-500 font-bold'>No consultations available for the selected date.</p>
+                        <p className='text-gray-500 font-bold'>{t('appointment.noConsultations')}</p>
                     </div>
                 )}
 
@@ -354,7 +356,7 @@ const Appointment = () => {
                     disabled={!slotTime}
                     className='w-full md:w-auto px-12 py-4.5 rounded-xl bg-primary text-white font-extrabold mt-10 hover:opacity-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all transform hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-primary/20 active:scale-98 text-sm'
                 >
-                    Confirm Booking
+                    {t('appointment.confirmBooking')}
                 </button>
             </div>
 
@@ -370,8 +372,8 @@ const Appointment = () => {
                         {!bookingSuccess ? (
                             <>
                                 <div>
-                                    <h2 className="text-2xl font-display font-extrabold text-text tracking-tight">Securing your booking</h2>
-                                    <p className="text-text-secondary mt-2.5 text-sm leading-relaxed font-medium">Let&apos;s take a calming deep breath together while we connect you with {doctorName}.</p>
+                                    <h2 className="text-2xl font-display font-extrabold text-text tracking-tight">{t('appointment.securingYourBooking')}</h2>
+                                    <p className="text-text-secondary mt-2.5 text-sm leading-relaxed font-medium">{t('appointment.letsBreathe')} {doctorName}.</p>
                                 </div>
                                 
                                 {/* Calming breathing guide circles */}
@@ -395,8 +397,8 @@ const Appointment = () => {
                                     </svg>
                                 </div>
                                 <div>
-                                    <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Booking Confirmed</h2>
-                                    <p className="text-gray-500 mt-3 text-sm leading-relaxed font-semibold">Your session with <strong>{doctorName}</strong> on <strong>{slotTime}</strong> is booked.</p>
+                                    <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">{t('appointment.bookingConfirmed')}</h2>
+                                    <p className="text-gray-500 mt-3 text-sm leading-relaxed font-semibold">{t('appointment.yourSessionWith')} <strong>{doctorName}</strong> {t('appointment.isBooked')}</p>
                                 </div>
                                 <button 
                                     onClick={() => {
@@ -405,7 +407,7 @@ const Appointment = () => {
                                     }}
                                     className="w-full sm:w-auto px-8 py-3.5 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/20 hover:opacity-95 transition-all transform hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-sm"
                                 >
-                                    View Appointments
+                                    {t('appointment.viewAppointments')}
                                 </button>
                             </div>
                         )}

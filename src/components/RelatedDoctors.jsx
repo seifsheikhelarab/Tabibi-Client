@@ -1,8 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AppContext } from '../context/AppContext'
 
 const RelatedDoctors = ({ speciality, docId }) => {
+    const { t } = useTranslation()
     const navigate = useNavigate()
     const { doctors } = useContext(AppContext)
     const [relDoc, setRelDoc] = useState([])
@@ -29,8 +31,8 @@ const RelatedDoctors = ({ speciality, docId }) => {
 
     return (
         <div className='flex flex-col items-center gap-4 my-16 text-text animate-fade-in-up'>
-            <h2 className='text-3xl font-display font-extrabold text-text tracking-tight'>Related Doctors</h2>
-            <p className='sm:w-1/3 text-center text-sm text-text-secondary font-medium'>Simply browse through our extensive list of trusted doctors.</p>
+            <h2 className='text-3xl font-display font-extrabold text-text tracking-tight'>{t('relatedDoctors.relatedDoctors')}</h2>
+            <p className='sm:w-1/3 text-center text-sm text-text-secondary font-medium'>{t('relatedDoctors.browseList')}</p>
             
             <div className='w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 pt-5'>
                 {relDoc.map((item, index) => {
@@ -51,7 +53,7 @@ const RelatedDoctors = ({ speciality, docId }) => {
                                     <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white shadow-sm`}>
                                         <span className={`w-1.5 h-1.5 rounded-full ${item.available ? 'bg-green-500' : 'bg-gray-400'}`}></span>
                                         <span className={item.available ? 'text-green-700' : 'text-text-muted'}>
-                                            {item.available ? 'Available' : 'Busy'}
+                                            {item.available ? t('relatedDoctors.available') : t('relatedDoctors.busy')}
                                         </span>
                                     </span>
                                 </div>

@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { assets } from '../assets/assets'
 
 const AboutCalmCanvas = () => {
@@ -55,6 +56,7 @@ const AboutCalmCanvas = () => {
 };
 
 const About = () => {
+    const { t } = useTranslation()
     return (
         <div className="pb-20 animate-fade-in-up">
 
@@ -64,13 +66,13 @@ const About = () => {
                 <div className="relative z-10">
                     <div className="inline-flex items-center gap-2 bg-primary/5 px-4 py-1.5 rounded-full border border-primary/10 mb-4">
                         <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                        <span className="text-primary text-[10px] uppercase tracking-widest font-bold">Our Mission</span>
+                        <span className="text-primary text-[10px] uppercase tracking-widest font-bold">{t('about.ourMission')}</span>
                     </div>
 
                     <h1 className='text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-text tracking-tight leading-tight max-w-4xl mx-auto'>
-                        Transforming Healthcare <br />
+                        {t('about.transformingHealthcare')} <br />
                         <span className="text-primary relative">
-                            Access For Everyone
+                            {t('about.accessForEveryone')}
                             <svg className="absolute left-0 bottom-[-8px] w-full h-2.5 text-primary/10" viewBox="0 0 300 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M3 9C60 3.5 180 3.5 297 7.5" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
                             </svg>
@@ -78,7 +80,7 @@ const About = () => {
                     </h1>
                     
                     <p className='mt-5 text-text-secondary max-w-2xl mx-auto text-base font-medium leading-relaxed'>
-                        Discover the story behind Tabibi and our commitment to making high-quality medical care approachable, calming, and available to everyone, everywhere.
+                        {t('about.discoverStory')}
                     </p>
                 </div>
             </div>
@@ -97,20 +99,20 @@ const About = () => {
                 <div className='flex flex-col gap-8 flex-1'>
                     <div className='space-y-5 text-text-secondary leading-relaxed font-medium text-base'>
                         <p>
-                            Welcome to <span className='text-primary font-bold'>Tabibi</span>, your trusted companion in managing your healthcare journey conveniently and efficiently. We understand the challenges individuals experience when scheduling consultations, monitoring diagnostics, and tracking health records.
+                            {t('about.welcomeTo')} <span className='text-primary font-bold'>Tabibi</span>, {t('about.yourTrustedCompanion')} {t('about.weUnderstand')}
                         </p>
                         <p>
-                            At Tabibi, we are committed to absolute excellence in healthcare technology. We continuously innovate, integrating the latest advancements to reduce patient anxiety, streamline workflows, and prioritize mental comfort alongside clinical efficiency.
+                            {t('about.atTabibi')}
                         </p>
                     </div>
 
                     <div className='bg-gradient-to-br from-primary/5 to-transparent p-8 rounded-2xl border border-primary/10 relative overflow-hidden'>
                         <span className="absolute top-2 left-4 text-7xl font-black text-primary/10 select-none">&ldquo;</span>
                         <h3 className='text-xs font-bold text-primary uppercase tracking-widest mb-3 relative z-10'>
-                            Our Unified Vision
+                            {t('about.ourUnifiedVision')}
                         </h3>
                         <p className='text-text-secondary relative z-10 font-medium text-sm leading-relaxed'>
-                            Our goal at Tabibi is to build a seamless, completely friction-free healthcare portal for every user. We bridge the gap between patients and specialized caretakers, providing direct access to premium care when you need it most.
+                            {t('about.ourGoal')}
                         </p>
                     </div>
                 </div>
@@ -118,26 +120,26 @@ const About = () => {
 
             <div className='mt-24'>
                 <div className='mb-10'>
-                    <h2 className='text-3xl font-display font-extrabold text-text tracking-tight'>Why Patients Choose Tabibi</h2>
+                    <h2 className='text-3xl font-display font-extrabold text-text tracking-tight'>{t('about.whyPatientsChoose')}</h2>
                     <div className='h-0.5 w-16 bg-primary rounded-full mt-3'></div>
                 </div>
 
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
                     {[
                         {
-                            title: "Absolute Efficiency",
-                            desc: "Friction-free, calming appointment slot booking integrated with patient scheduling timelines.",
-                            tag: "Time-Saving"
+                            title: t('about.absoluteEfficiency'),
+                            desc: t('about.frictionFree'),
+                            tag: t('about.timeSaving')
                         },
                         {
-                            title: "Seamless Convenience",
-                            desc: "Instant directory filters and dedicated specialist recommendations direct to your screen.",
-                            tag: "Easy Access"
+                            title: t('about.seamlessConvenience'),
+                            desc: t('about.instantDirectory'),
+                            tag: t('about.easyAccess')
                         },
                         {
-                            title: "Empathetic Focus",
-                            desc: "Soothing visual flows, breathing guides, and real-time form checks designed to lower anxiety.",
-                            tag: "Wellness-Centered"
+                            title: t('about.empatheticFocus'),
+                            desc: t('about.soothingVisual'),
+                            tag: t('about.wellnessCentered')
                         }
                     ].map((item, index) => (
                         <div

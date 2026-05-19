@@ -1,10 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { AppContext } from '../context/AppContext'
 import { toast } from 'react-toastify'
 import { assets } from '../assets/assets'
 import { uploadApi } from '../api/client'
 
 const MyProfile = () => {
+    const { t } = useTranslation()
     const { patientData, setPatientData, updateUserProfileData, createPatientProfile, session } = useContext(AppContext)
     const [isEdit, setIsEdit] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
@@ -14,10 +16,11 @@ const MyProfile = () => {
     const [shakeField, setShakeField] = useState('')
 
     const formatDate = (dateStr) => {
-        if (!dateStr) return 'Not set'
+        if (!dateStr) return t('myProfile.notSet')
         const date = new Date(dateStr)
-        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+        return date.toLocaleDateString(i18n.language || 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })
     }
+    const { i18n } = useTranslation()
     const [image, setImage] = useState(false)
     const [newImageFile, setNewImageFile] = useState(null)
 
@@ -63,19 +66,18 @@ const MyProfile = () => {
         // Validate final inputs
         const isFirstNameValid = validateName(patientData?.firstName || '', 'firstName')
         const isLastNameValid = validateName(patientData?.lastName || '', 'lastName')
-        const isPhoneValid = validatePhone(patientData?.phone || '')
-
-        if (!isFirstNameValid) {
+        const isPhoneValid = validatePhone(patientData?.phone || '');
+            if (!isFirstNameValid) {
             triggerShake('firstName')
-            return toast.error('First name cannot be empty')
+            return toast.error(t('myProfile.firstnameRequired'))
         }
         if (!isLastNameValid) {
             triggerShake('lastName')
-            return toast.error('Last name cannot be empty')
+            return toast.error(t('myProfile.lastnameRequired'))
         }
         if (!isPhoneValid) {
             triggerShake('phone')
-            return toast.error('Please enter a valid phone number')
+            return toast.error(t('myProfile.validPhone'))
         }
 
         try {
@@ -164,7 +166,7 @@ const MyProfile = () => {
                                     validateName(e.target.value, 'firstName')
                                 }}
                                 value={patientData?.firstName || ''} 
-                                placeholder="First name" 
+                                placeholder={t('myProfile.firstName')} 
                             />
                             <input 
                                 className={`bg-gray-50/80 border px-4 py-3 rounded-xl text-lg font-bold w-full transition-all focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none ${
@@ -176,7 +178,7 @@ const MyProfile = () => {
                                     validateName(e.target.value, 'lastName')
                                 }}
                                 value={patientData?.lastName || ''} 
-                                placeholder="Last name" 
+                                placeholder={t('myProfile.lastName')} 
                             />
                         </div>
                     ) : (
@@ -187,15 +189,15 @@ const MyProfile = () => {
             </div>
 
             <div className='bg-white rounded-2xl p-6 border border-border-light shadow-sm mb-6'>
-                <h2 className='text-xs font-bold text-text-muted uppercase tracking-widest mb-5'>Contact Details</h2>
+                <h2 className='text-xs font-bold text-text-muted uppercase tracking-widest mb-5'>{t('myProfile.contactDetails')}</h2>
                 <div className='space-y-4'>
                     <div className='flex justify-between items-center py-2 border-b border-border-light'>
-                        <span className='text-text-secondary font-medium text-sm'>Email Address</span>
+                        <span className='text-text-secondary font-medium text-sm'>{t('myProfile.emailAddress')}</span>
                         <span className='text-text font-semibold text-sm'>{patientData?.email || session?.user?.email}</span>
                     </div>
                     
                     <div className='flex justify-between items-center py-2 border-b border-border-light'>
-                        <span className='text-text-secondary font-medium text-sm'>Mobile Phone</span>
+                        <span className='text-text-secondary font-medium text-sm'>{t('myProfile.mobilePhone')}</span>
                         {isEdit ? (
                             <input 
                                 className={`bg-gray-50/80 border px-4 py-2.5 rounded-xl text-right text-sm transition-all focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none max-w-[200px] ${
@@ -207,52 +209,52 @@ const MyProfile = () => {
                                     validatePhone(e.target.value)
                                 }}
                                 value={patientData?.phone || ''} 
-                                placeholder="Add mobile phone" 
+                                placeholder={t('myProfile.addMobilePhone')} 
                             />
                         ) : (
-                            <span className='text-text font-semibold text-sm'>{patientData?.phone || 'Not provided'}</span>
+                            <span className='text-text font-semibold text-sm'>{patientData?.phone || t('myProfile.notProvided')}</span>
                         )}
                     </div>
 
                     <div className='flex justify-between items-center py-2'>
-                        <span className='text-text-secondary font-medium text-sm'>Home Address</span>
+                        <span className='text-text-secondary font-medium text-sm'>{t('myProfile.homeAddress')}</span>
                         {isEdit ? (
                             <input 
                                 className='bg-gray-50/80 border border-gray-100 px-4 py-2.5 rounded-xl text-right text-sm transition-all focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none max-w-[240px]' 
                                 type="text"
                                 onChange={(e) => setPatientData(prev => ({ ...prev, address: e.target.value }))}
                                 value={patientData?.address || ''} 
-                                placeholder="Add home address" 
+                                placeholder={t('myProfile.addHomeAddress')} 
                             />
                         ) : (
-                            <span className='text-text font-semibold text-sm'>{patientData?.address || 'Not provided'}</span>
+                            <span className='text-text font-semibold text-sm'>{patientData?.address || t('myProfile.notProvided')}</span>
                         )}
                     </div>
                 </div>
             </div>
 
             <div className='bg-white rounded-2xl p-6 border border-border-light shadow-sm mb-6'>
-                <h2 className='text-xs font-bold text-text-muted uppercase tracking-widest mb-5'>Personal Details</h2>
+                <h2 className='text-xs font-bold text-text-muted uppercase tracking-widest mb-5'>{t('myProfile.personalDetails')}</h2>
                 <div className='space-y-4'>
                     <div className='flex justify-between items-center py-2 border-b border-border-light'>
-                        <span className='text-text-secondary font-medium text-sm'>Gender</span>
+                        <span className='text-text-secondary font-medium text-sm'>{t('myProfile.gender')}</span>
                         {isEdit ? (
                             <select 
                                 className='bg-gray-50/80 border border-gray-100 px-4 py-2.5 rounded-xl text-sm transition-all focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none cursor-pointer text-gray-700 font-medium'
                                 onChange={(e) => setPatientData(prev => ({ ...prev, gender: e.target.value }))}
                                 value={patientData?.gender || 'Not Selected'} 
                             >
-                                <option value="Not Selected">Prefer not to say</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
+                                <option value="Not Selected">{t('myProfile.preferNotToSay')}</option>
+                                <option value="Male">{t('myProfile.male')}</option>
+                                <option value="Female">{t('myProfile.female')}</option>
                             </select>
                         ) : (
-                            <span className='text-text font-semibold text-sm'>{patientData?.gender || 'Not specified'}</span>
+                            <span className='text-text font-semibold text-sm'>{patientData?.gender || t('myProfile.notSpecified')}</span>
                         )}
                     </div>
                     
                     <div className='flex justify-between items-center py-2'>
-                        <span className='text-text-secondary font-medium text-sm'>Date of Birth</span>
+                        <span className='text-text-secondary font-medium text-sm'>{t('myProfile.dateOfBirth')}</span>
                         {isEdit ? (
                             <input 
                                 className='bg-gray-50/80 border border-gray-100 px-4 py-2.5 rounded-xl text-sm transition-all focus:ring-4 focus:ring-primary/5 focus:border-primary outline-none text-gray-700 font-medium' 
@@ -277,7 +279,7 @@ const MyProfile = () => {
                         disabled={isSaving}
                         className='px-6 py-3 rounded-xl border border-border text-text-secondary hover:bg-surface-raised transition-all font-semibold active:scale-[0.97] text-sm disabled:opacity-40'
                     >
-                        Cancel
+                        {t('myProfile.cancel')}
                     </button>
                 )}
                 {isEdit ? (
@@ -286,14 +288,14 @@ const MyProfile = () => {
                         disabled={isSaving}
                         className='px-7 py-3 rounded-xl bg-primary text-white hover:opacity-95 transition-all font-semibold active:scale-[0.97] shadow-md text-sm disabled:opacity-40 flex items-center gap-2'
                     >
-                        {isSaving ? 'Saving Changes...' : 'Save Changes'}
+                        {isSaving ? t('myProfile.savingChanges') : t('myProfile.saveChanges')}
                     </button>
                 ) : (
                     <button 
                         onClick={() => setIsEdit(true)} 
                         className='px-7 py-3 rounded-xl border border-primary text-primary hover:bg-primary hover:text-white transition-all font-semibold active:scale-[0.97] text-sm'
                     >
-                        Edit Information
+                        {t('myProfile.editInformation')}
                     </button>
                 )}
             </div>
