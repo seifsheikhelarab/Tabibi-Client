@@ -292,7 +292,8 @@
     "failedToConnect": "فشل الاتصال بالمساعد.",
     "networkError": "خطأ في الشبكة. يرجى التأكد من أن الخادم يعمل.",
     "sorryNoResponse": "عذرًا، لم أتمكن من الحصول على رد.",
-    "bookSlot": "احجز موعد"
+    "bookSlot": "احجز موعد",
+    "tryAssistant": "تحتاج مساعدة؟ جرب المساعد الذكي لطبيبي!"
   },
   "specialityMenu": {
     "findBySpeciality": "ابحث حسب التخصص",

@@ -292,7 +292,8 @@
     "failedToConnect": "Failed to connect to assistant.",
     "networkError": "Network error. Please make sure the backend is running.",
     "sorryNoResponse": "I'm sorry, I couldn't get a response.",
-    "bookSlot": "Book Slot"
+    "bookSlot": "Book Slot",
+    "tryAssistant": "Need help? Try Tabibi AI Assistant!"
   },
   "specialityMenu": {
     "findBySpeciality": "Find by Speciality",
