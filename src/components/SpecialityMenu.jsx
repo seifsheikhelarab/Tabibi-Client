@@ -7,6 +7,24 @@ const SpecialityMenu = () => {
     const { t } = useTranslation()
     const navigate = useNavigate()
 
+    const specialityKeys = {
+        'Cardiology': 'cardiology',
+        'Neurology': 'neurology',
+        'General Surgery': 'generalSurgery',
+        'Urology': 'urology',
+        'Orthopedics': 'orthopedics',
+        'Dentistry': 'dentistry',
+        'Ear, Nose and Throat': 'ent',
+        'Dermatology': 'dermatology',
+        'Ophthalmology': 'ophthalmology',
+        'Gastroenterology': 'gastroenterology'
+    }
+
+    const tSpeciality = (name) => {
+        const key = specialityKeys[name]
+        return key ? t(`specialities.${key}`) : name
+    }
+
     return (
         <div id='speciality' className='flex flex-col items-center gap-6 py-20 text-text'>
             <div className='text-center max-w-xl mx-auto'>

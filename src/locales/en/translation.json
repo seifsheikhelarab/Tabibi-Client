@@ -16,7 +16,15 @@
     "bookAppointment": "Book Appointment",
     "withTrustedDoctors": "With Trusted Doctors",
     "exploreNetwork": "Explore our network of certified professionals. Pick a slot, connect, and secure your session.",
-    "bookNow": "Book appointment"
+    "bookNow": "Book appointment",
+    "slide2Badge": "Smart Matching",
+    "slide2Title": "Find Your",
+    "slide2Highlight": "Perfect Specialist",
+    "slide2Desc": "Answer a few questions and let our smart matching find the right doctor for your symptoms and preferences.",
+    "slide3Badge": "Calm & Care",
+    "slide3Title": "Booking",
+    "slide3Highlight": "Made Simple",
+    "slide3Desc": "A soothing, anxiety-free booking experience with breathing guides and seamless payment."
   },
   "banner": {
     "bookAppointment": "Book Appointment",
@@ -120,7 +128,11 @@
     "yearsExp": "Years Exp.",
     "locationNotListed": "Location not listed",
     "rating": "Rating",
-    "trustedReviews": "trusted reviews"
+    "trustedReviews": "trusted reviews",
+    "rating1Plus": "★ 1+",
+    "rating2Plus": "★ 2+",
+    "rating3Plus": "★ 3+",
+    "rating4Plus": "★ 4+"
   },
   "appointment": {
     "active": "Active",
@@ -143,7 +155,8 @@
     "viewAppointments": "View Appointments",
     "pleaseCompleteProfile": "Please complete your profile first",
     "noAvailableSlots": "No available slots for this day",
-    "pleaseSelectTime": "Please select a booking time"
+    "pleaseSelectTime": "Please select a booking time",
+    "calmBookingCore": "Tabibi Calm booking core"
   },
   "myAppointments": {
     "patientWorkspace": "Patient Workspace",
@@ -255,7 +268,19 @@
     "new": "New",
     "scheduleAnAppointment": "Schedule an appointment directly.",
     "singleMatch": "1 matched specialist",
-    "matchesLabel": "matched specialists"
+    "matchesLabel": "matched specialists",
+    "clinicalDescriptions": {
+      "cardiology": "Heart health, blood pressure, and cardiovascular wellness.",
+      "neurology": "Brain, nervous system, chronic headaches, and spine care.",
+      "generalSurgery": "Surgical consultation, minimally invasive procedures.",
+      "urology": "Kidney, bladder, urinary tract, and male reproductive health.",
+      "orthopedics": "Bones, joints, ligaments, sports injuries, and physical therapy.",
+      "dentistry": "Oral hygiene, dental care, crowns, and smile enhancement.",
+      "ent": "Sinus, hearing, swallowing, and upper respiratory tract.",
+      "dermatology": "Skin conditions, acne, eczema, mole tracking, and cosmetic care.",
+      "ophthalmology": "Eye health, vision checkups, and optical prescriptions.",
+      "gastroenterology": "Digestive tract, stomach, liver, and abdominal health."
+    }
   },
   "chatbot": {
     "greeting": "Hello! I am your Tabibi assistant. Describe your symptoms, and I will recommend a specialist for you.",
@@ -296,6 +321,21 @@
     "viewAll": "View all",
     "submit": "Submit",
     "no": "No",
-    "yes": "Yes"
+    "yes": "Yes",
+    "notAvailable": "N/A",
+    "professionalCaregiver": "Professional caregiver.",
+    "switchLanguage": "Switch to English"
+  },
+  "specialities": {
+    "cardiology": "Cardiology",
+    "neurology": "Neurology",
+    "generalSurgery": "General Surgery",
+    "urology": "Urology",
+    "orthopedics": "Orthopedics",
+    "dentistry": "Dentistry",
+    "ent": "Ear, Nose and Throat",
+    "dermatology": "Dermatology",
+    "ophthalmology": "Ophthalmology",
+    "gastroenterology": "Gastroenterology"
   }
 }

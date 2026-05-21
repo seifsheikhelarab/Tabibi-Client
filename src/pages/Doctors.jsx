@@ -84,10 +84,10 @@ const Doctors = () => {
             className="text-sm bg-surface-raised text-text-secondary rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all font-medium border border-border-light cursor-pointer"
           >
             <option value="">{t('doctors.minRating')}</option>
-            <option value="1">&#9733; 1+</option>
-            <option value="2">&#9733; 2+</option>
-            <option value="3">&#9733; 3+</option>
-            <option value="4">&#9733; 4+</option>
+            <option value="1">{t('doctors.rating1Plus')}</option>
+            <option value="2">{t('doctors.rating2Plus')}</option>
+            <option value="3">{t('doctors.rating3Plus')}</option>
+            <option value="4">{t('doctors.rating4Plus')}</option>
           </select>
           <select
             value={sortOption}

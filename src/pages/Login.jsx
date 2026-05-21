@@ -81,12 +81,12 @@ const Login = () => {
           name
         }, {
           onError: (ctx) => {
-            toast.error(ctx.error.message || 'Sign up failed')
+            toast.error(ctx.error.message || t('auth.signUpFailed'))
           }
         })
 
         if (!error) {
-          toast.success('Account created! Welcome aboard.')
+          toast.success(t('auth.accountCreated'))
           setState('Login')
           setName('')
           setPassword('')
@@ -97,17 +97,17 @@ const Login = () => {
           password
         }, {
           onError: (ctx) => {
-            toast.error(ctx.error.message || 'Sign in failed')
+            toast.error(ctx.error.message || t('auth.signInFailed'))
           }
         })
 
         if (!error) {
-          toast.success('Welcome back!')
+          toast.success(t('auth.welcomeBackMsg'))
           navigate('/')
         }
       }
     } catch (err) {
-      toast.error(err.message || 'An error occurred')
+      toast.error(err.message || t('auth.errorOccurred'))
     } finally {
       setIsLoading(false)
     }

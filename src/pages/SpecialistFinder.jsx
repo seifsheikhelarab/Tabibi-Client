@@ -4,8 +4,8 @@ import { specialityData } from '../assets/assets'
 import { Link, useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 
-const SpecialistFinder = () => {
-    const { t } = useTranslation()
+const SpecialistFinder = ({ section }) => {
+    const { t, i18n } = useTranslation()
     const navigate = useNavigate()
     const { doctors, currencySymbol } = useContext(AppContext)
 
@@ -17,18 +17,27 @@ const SpecialistFinder = () => {
     const [ratingPreference, setRatingPreference] = useState('all') // 'all' or 'top' (>= 4.5)
     const [feePreference, setFeePreference] = useState('all') // 'all', 'budget' (< 300)
 
-    // Specialties clinical descriptions
-    const clinicalDescriptions = {
-        'Cardiology': 'Heart health, blood pressure, and cardiovascular wellness.',
-        'Neurology': 'Brain, nervous system, chronic headaches, and spine care.',
-        'General Surgery': 'Surgical consultation, minimally invasive procedures.',
-        'Urology': 'Kidney, bladder, urinary tract, and male reproductive health.',
-        'Orthopedics': 'Bones, joints, ligaments, sports injuries, and physical therapy.',
-        'Dentistry': 'Oral hygiene, dental care, crowns, and smile enhancement.',
-        'Ear, Nose and Throat': 'Sinus, hearing, swallowing, and upper respiratory tract.',
-        'Dermatology': 'Skin conditions, acne, eczema, mole tracking, and cosmetic care.',
-        'Ophthalmology': 'Eye health, vision checkups, and optical prescriptions.',
-        'Gastroenterology': 'Digestive tract, stomach, liver, and abdominal health.'
+    const getClinicalDescription = (speciality) => {
+        const key = speciality.toLowerCase().replace(/\s+/g, '')
+        return t(`specialistFinder.clinicalDescriptions.${key}`, t('specialistFinder.scheduleAnAppointment'))
+    }
+
+    const specialityKeys = {
+        'Cardiology': 'cardiology',
+        'Neurology': 'neurology',
+        'General Surgery': 'generalSurgery',
+        'Urology': 'urology',
+        'Orthopedics': 'orthopedics',
+        'Dentistry': 'dentistry',
+        'Ear, Nose and Throat': 'ent',
+        'Dermatology': 'dermatology',
+        'Ophthalmology': 'ophthalmology',
+        'Gastroenterology': 'gastroenterology'
+    }
+
+    const tSpeciality = (name) => {
+        const key = specialityKeys[name]
+        return key ? t(`specialities.${key}`) : name
     }
 
     // Smooth page transitions
@@ -89,15 +98,17 @@ const SpecialistFinder = () => {
         : `${matchedDoctors.length} ${t('specialistFinder.matchesLabel')}`
 
     return (
-        <div className='py-12 md:py-20 text-gray-800 max-w-6xl mx-auto px-4 animate-fade-in-up'>
+        <div className={`text-gray-800 max-w-6xl mx-auto px-4 animate-fade-in-up ${section ? '' : 'py-12 md:py-20'}`}>
             {/* Header section with back button */}
-            <div className='mb-10'>
-                <button 
-                    onClick={() => navigate(-1)} 
-                    className='text-xs font-bold text-gray-400 hover:text-primary transition-colors flex items-center gap-1.5 mb-6 active:scale-95 duration-200'
-                >
-                    {t('specialistFinder.backToPreviousPage')}
-                </button>
+            <div className={`${section ? 'mb-4' : 'mb-10'}`}>
+                {!section && (
+                    <button 
+                        onClick={() => navigate(-1)} 
+                        className='text-xs font-bold text-gray-400 hover:text-primary transition-colors flex items-center gap-1.5 mb-6 active:scale-95 duration-200'
+                    >
+                        {t('specialistFinder.backToPreviousPage')}
+                    </button>
+                )}
                 <div className='flex flex-col md:flex-row md:items-end justify-between gap-6'>
                     <div className='max-w-xl'>
                         <span className='text-xs font-bold text-primary uppercase tracking-widest bg-primary/5 px-4 py-1.5 rounded-full inline-block mb-3'>
@@ -136,7 +147,8 @@ const SpecialistFinder = () => {
                         <div 
                             className='h-full bg-primary rounded-full transition-all duration-600 cubic-bezier(0.16, 1, 0.3, 1)' 
                             style={{ 
-                                width: step === 1 ? '33.3%' : step === 2 ? '66.6%' : '100%' 
+                                width: step === 1 ? '33.3%' : step === 2 ? '66.6%' : '100%',
+                                ...(i18n.dir() === 'rtl' ? { transform: 'scaleX(-1)' } : {})
                             }}
                         />
                     </div>
@@ -171,23 +183,23 @@ const SpecialistFinder = () => {
                                             style={{
                                                 animationDelay: `${index * 40}ms`
                                             }}
-                                            className={`flex items-start text-left p-5 rounded-2xl border transition-all duration-300 group relative overflow-hidden active:scale-[0.98] animate-fade-in-up ${
+                                            className={`flex items-start text-left rtl:text-right p-5 rounded-2xl border transition-all duration-300 group relative overflow-hidden active:scale-[0.98] animate-fade-in-up ${
                                                 isSelected 
                                                     ? 'border-primary bg-primary/5 ring-1 ring-primary shadow-sm' 
                                                     : 'border-gray-100 bg-gray-50/40 hover:border-gray-200 hover:bg-gray-50/80 hover:shadow-md'
                                             }`}
                                         >
-                                            <div className='w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-white shadow-sm border border-gray-100 mr-4 transition-transform group-hover:scale-105'>
+                                            <div className='w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-white shadow-sm border border-gray-100 mr-4 rtl:ml-4 rtl:mr-0 transition-transform group-hover:scale-105'>
                                                 <img className='w-8 h-8 object-contain' src={item.image} alt={item.speciality} />
                                             </div>
                                             <div>
                                                 <p className={`font-bold text-sm transition-colors ${
                                                     isSelected ? 'text-primary' : 'text-gray-800'
                                                 }`}>
-                                                    {item.speciality}
+                                                    {tSpeciality(item.speciality)}
                                                 </p>
                                                 <p className='text-gray-400 text-xs mt-1 leading-normal font-medium'>
-                                                    {clinicalDescriptions[item.speciality] || t('specialistFinder.scheduleAnAppointment')}
+                                                    {getClinicalDescription(item.speciality)}
                                                 </p>
                                             </div>
                                         </button>
@@ -223,7 +235,7 @@ const SpecialistFinder = () => {
                     {step === 2 && (
                         <div className='animate-fade-in-up duration-300 max-w-2xl'>
                             <h2 className='text-xl md:text-2xl font-extrabold text-gray-900 mb-6'>
-                                {t('specialistFinder.tellUsPreference')} <span className='text-primary'>{selectedSpeciality}</span>
+                                {t('specialistFinder.tellUsPreference')} <span className='text-primary'>{tSpeciality(selectedSpeciality)}</span>
                             </h2>
 
                             <div className='space-y-6 mb-10'>
@@ -234,7 +246,7 @@ const SpecialistFinder = () => {
                                         <button
                                             type="button"
                                             onClick={() => setAvailableOnly(false)}
-                                            className={`p-4 rounded-xl border text-left text-sm font-bold transition-all duration-300 active:scale-[0.98] ${
+                                            className={`p-4 rounded-xl border text-left rtl:text-right text-sm font-bold transition-all duration-300 active:scale-[0.98] ${
                                                 !availableOnly 
                                                     ? 'border-primary bg-primary/5 text-primary ring-1 ring-primary shadow-sm' 
                                                     : 'border-gray-100 bg-gray-50 hover:bg-gray-100 text-gray-600'
@@ -245,7 +257,7 @@ const SpecialistFinder = () => {
                                         <button
                                             type="button"
                                             onClick={() => setAvailableOnly(true)}
-                                            className={`p-4 rounded-xl border text-left text-sm font-bold transition-all duration-300 active:scale-[0.98] ${
+                                            className={`p-4 rounded-xl border text-left rtl:text-right text-sm font-bold transition-all duration-300 active:scale-[0.98] ${
                                                 availableOnly 
                                                     ? 'border-primary bg-primary/5 text-primary ring-1 ring-primary shadow-sm' 
                                                     : 'border-gray-100 bg-gray-50 hover:bg-gray-100 text-gray-600'
@@ -263,7 +275,7 @@ const SpecialistFinder = () => {
                                         <button
                                             type="button"
                                             onClick={() => setRatingPreference('all')}
-                                            className={`p-4 rounded-xl border text-left text-sm font-bold transition-all duration-300 active:scale-[0.98] ${
+                                            className={`p-4 rounded-xl border text-left rtl:text-right text-sm font-bold transition-all duration-300 active:scale-[0.98] ${
                                                 ratingPreference === 'all' 
                                                     ? 'border-primary bg-primary/5 text-primary ring-1 ring-primary shadow-sm' 
                                                     : 'border-gray-100 bg-gray-50 hover:bg-gray-100 text-gray-600'
@@ -274,7 +286,7 @@ const SpecialistFinder = () => {
                                         <button
                                             type="button"
                                             onClick={() => setRatingPreference('top')}
-                                            className={`p-4 rounded-xl border text-left text-sm font-bold transition-all duration-300 active:scale-[0.98] ${
+                                            className={`p-4 rounded-xl border text-left rtl:text-right text-sm font-bold transition-all duration-300 active:scale-[0.98] ${
                                                 ratingPreference === 'top' 
                                                     ? 'border-primary bg-primary/5 text-primary ring-1 ring-primary shadow-sm' 
                                                     : 'border-gray-100 bg-gray-50 hover:bg-gray-100 text-gray-600'
@@ -292,7 +304,7 @@ const SpecialistFinder = () => {
                                         <button
                                             type="button"
                                             onClick={() => setFeePreference('all')}
-                                            className={`p-4 rounded-xl border text-left text-sm font-bold transition-all duration-300 active:scale-[0.98] ${
+                                            className={`p-4 rounded-xl border text-left rtl:text-right text-sm font-bold transition-all duration-300 active:scale-[0.98] ${
                                                 feePreference === 'all' 
                                                     ? 'border-primary bg-primary/5 text-primary ring-1 ring-primary shadow-sm' 
                                                     : 'border-gray-100 bg-gray-50 hover:bg-gray-100 text-gray-600'
@@ -303,7 +315,7 @@ const SpecialistFinder = () => {
                                         <button
                                             type="button"
                                             onClick={() => setFeePreference('budget')}
-                                            className={`p-4 rounded-xl border text-left text-sm font-bold transition-all duration-300 active:scale-[0.98] ${
+                                            className={`p-4 rounded-xl border text-left rtl:text-right text-sm font-bold transition-all duration-300 active:scale-[0.98] ${
                                                 feePreference === 'budget' 
                                                     ? 'border-primary bg-primary/5 text-primary ring-1 ring-primary shadow-sm' 
                                                     : 'border-gray-100 bg-gray-50 hover:bg-gray-100 text-gray-600'
@@ -341,7 +353,7 @@ const SpecialistFinder = () => {
                             <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 animate-fade-in-up' style={{ animationDelay: '50ms' }}>
                                 <div>
                                     <h2 className='text-xl md:text-2xl font-extrabold text-gray-900'>
-                                        {t('specialistFinder.yourCuratedMatches')} {selectedSpeciality} {t('specialistFinder.matches')}
+                                        {t('specialistFinder.yourCuratedMatches')} {tSpeciality(selectedSpeciality)} {t('specialistFinder.matches')}
                                     </h2>
                                     <p className='text-gray-400 text-sm font-semibold mt-1'>
                                         {t('specialistFinder.basedOnChoices')} <span className='text-primary font-bold'>{doctorCountText}</span>.
@@ -419,7 +431,7 @@ const SpecialistFinder = () => {
                                     <div className='w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 text-xl font-bold mb-4'>?</div>
                                     <h3 className='text-base font-extrabold text-gray-800 mb-1'>{t('specialistFinder.noExactMatch')}</h3>
                                     <p className='text-xs text-gray-400 leading-relaxed font-semibold mb-6'>
-                                        {t('specialistFinder.couldNotFind')} {selectedSpeciality}. {t('specialistFinder.tryLoosening')}
+                                        {t('specialistFinder.couldNotFind')} {tSpeciality(selectedSpeciality)}. {t('specialistFinder.tryLoosening')}
                                     </p>
                                     <button
                                         type="button"

@@ -2,11 +2,13 @@ import { createContext, useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { doctorsApi, patientsApi, appointmentsApi } from "../api/client";
 import { authClient } from "../api/auth";
+import { useTranslation } from "react-i18next";
 
 export const AppContext = createContext()
 
 const AppContextProvider = (props) => {
 
+    const { t } = useTranslation()
     const currencySymbol = 'EGP'
 
     const [doctors, setDoctors] = useState([])
@@ -25,7 +27,7 @@ const AppContextProvider = (props) => {
                     const name = doc.name || `${doc.firstName || ''} ${doc.lastName || ''}`.trim() || 'Doctor';
                     const speciality = doc.speciality || doc.specialization || 'General';
                     const degree = doc.degree || doc.qualification || 'M.B.B.S';
-                    const about = doc.about || doc.bio || 'Professional caregiver.';
+                    const about = doc.about || doc.bio || t('common.professionalCaregiver');
                     const available = typeof doc.available === 'boolean' ? doc.available : (typeof doc.isAvailable === 'boolean' ? doc.isAvailable : true);
                     return {
                         ...doc,
@@ -104,7 +106,7 @@ const AppContextProvider = (props) => {
         try {
             const organizationId = session?.activeOrganizationId || session?.user?.organizationId
             if (!organizationId) {
-                toast.error('No organization found. Please select or create one.')
+                toast.error(t('auth.noOrg'))
                 return null
             }
 
@@ -130,7 +132,7 @@ const AppContextProvider = (props) => {
             const result = await patientsApi.update(patientData.id, data)
             const patient = result?.data ?? result
             setPatientData(patient)
-            toast.success('Profile updated successfully')
+            toast.success(t('myProfile.profileUpdated'))
             return true
         } catch (error) {
             console.error(error)

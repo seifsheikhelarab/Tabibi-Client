@@ -51,7 +51,7 @@ const Navbar = () => {
         <button
           onClick={() => changeLanguage(currentLanguage === 'ar' ? 'en' : 'ar')}
           className='px-3 py-1.5 rounded-xl border border-border-light text-xs font-bold text-text-secondary hover:bg-surface-raised hover:text-primary transition-all duration-200 flex items-center gap-1.5'
-          title={currentLanguage === 'ar' ? 'Switch to English' : 'التحويل إلى العربية'}
+          title={t('common.switchLanguage')}
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />

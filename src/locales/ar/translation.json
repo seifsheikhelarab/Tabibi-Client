@@ -16,7 +16,15 @@
     "bookAppointment": "احجز موعدًا",
     "withTrustedDoctors": "مع أطباء موثوقين",
     "exploreNetwork": "استكشف شبكتنا من المهنيين المعتمدين. اختر موعدًا، تواصل، واحجز جلستك.",
-    "bookNow": "احجز موعدًا"
+    "bookNow": "احجز موعدًا",
+    "slide2Badge": "المطابقة الذكية",
+    "slide2Title": "اعثر على",
+    "slide2Highlight": "الأخصائي المثالي",
+    "slide2Desc": "أجب على بضعة أسئلة ودع المطابقة الذكية تجد الطبيب المناسب لأعراضك وتفضيلاتك.",
+    "slide3Badge": "الهدوء والرعاية",
+    "slide3Title": "حجز",
+    "slide3Highlight": "بكل سهولة",
+    "slide3Desc": "تجربة حجز مهدئة خالية من القلق مع أدلة التنفس والدفع السلس."
   },
   "banner": {
     "bookAppointment": "احجز موعدًا",
@@ -120,7 +128,11 @@
     "yearsExp": "سنوات خبرة",
     "locationNotListed": "الموقع غير مدرج",
     "rating": "التقييم",
-    "trustedReviews": "تقييمات موثوقة"
+    "trustedReviews": "تقييمات موثوقة",
+    "rating1Plus": "★ 1+",
+    "rating2Plus": "★ 2+",
+    "rating3Plus": "★ 3+",
+    "rating4Plus": "★ 4+"
   },
   "appointment": {
     "active": "نشط",
@@ -143,7 +155,8 @@
     "viewAppointments": "عرض المواعيد",
     "pleaseCompleteProfile": "يرجى إكمال ملفك الشخصي أولًا",
     "noAvailableSlots": "لا توجد مواعيد متاحة لهذا اليوم",
-    "pleaseSelectTime": "يرجى اختيار وقت الحجز"
+    "pleaseSelectTime": "يرجى اختيار وقت الحجز",
+    "calmBookingCore": "طبيبي كالم Booking Core"
   },
   "myAppointments": {
     "patientWorkspace": "مساحة المريض",
@@ -220,14 +233,14 @@
     "guidedMatchmaker": "المطابق الموجه",
     "interactiveFinder": "الباحث التفاعلي عن الأخصائي",
     "diagnosticMatching": "تقوم أداة المطابقة التشخيصية بتنسيق تخصصك، وتوافر المواعيد، وتفضيلات رسوم الجلسة لتوجيهك نحو الأخصائي المناسب.",
-    "backToPreviousPage": "← العودة إلى الصفحة السابقة",
+    "backToPreviousPage": "العودة إلى الصفحة السابقة →",
     "resetStartOver": "✕ إعادة التعيين والبدء من جديد",
     "step1": "1. التخصص",
     "step2": "2. التفضيلات",
     "step3": "3. النتائج",
     "whatDepartment": "ما هو التخصص السريري أو القسم الذي تبحث عنه؟",
     "browseAllSpecialists": "تصفح جميع الأخصائيين يدويًا",
-    "nextStep": "الخطوة التالية →",
+    "nextStep": "← الخطوة التالية",
     "tellUsPreference": "أخبرنا قليلًا عن تفضيلاتك لـ",
     "appointmentSchedule": "جدول المواعيد",
     "showAllSchedules": "عرض جميع المواعيد",
@@ -238,12 +251,12 @@
     "consultationFeeLimit": "حد رسوم الاستشارة",
     "showAllFees": "عرض جميع الرسوم",
     "budgetFriendly": "مناسب للميزانية (أقل من 300",
-    "back": "← رجوع",
-    "findMatches": "اعثر على مطابقات →",
+    "back": "رجوع →",
+    "findMatches": "← اعثر على مطابقات",
     "yourCuratedMatches": "نتائج البحث",
     "matches": "مطابقات",
     "basedOnChoices": "بناءً على جدولك واختيارات التقييم، وجدنا",
-    "viewAllSpecialists": "عرض جميع الأخصائيين في هذا القسم →",
+    "viewAllSpecialists": "← عرض جميع الأخصائيين في هذا القسم",
     "consultationFee": "رسوم الاستشارة",
     "noExactMatch": "لا توجد مطابقة تمامًا لمعاييرك",
     "couldNotFind": "لم نتمكن من العثور على أخصائيين يطابقون جميع تفضيلاتك في",
@@ -255,7 +268,19 @@
     "new": "جديد",
     "scheduleAnAppointment": "احجز موعدًا مباشرة.",
     "singleMatch": "أخصائي واحد مطابق",
-    "matchesLabel": "أخصائي مطابق"
+    "matchesLabel": "أخصائي مطابق",
+    "clinicalDescriptions": {
+      "cardiology": "صحة القلب، ضغط الدم، والعافية القلبية الوعائية.",
+      "neurology": "الدماغ، الجهاز العصبي، الصداع المزمن، ورعاية العمود الفقري.",
+      "generalSurgery": "استشارات جراحية، إجراءات طفيفة التوغل.",
+      "urology": "الكلى، المثانة، المسالك البولية، وصحة الجهاز التناسلي الذكري.",
+      "orthopedics": "العظام، المفاصل، الأربطة، إصابات الرياضة، والعلاج الطبيعي.",
+      "dentistry": "النظافة الفموية، العناية بالأسنان، التيجان، وتحسين الابتسامة.",
+      "ent": "الجيوب الأنفية، السمع، البلع، والجهاز التنفسي العلوي.",
+      "dermatology": "حالات الجلد، حب الشباب، الإكزيما، تتبع الشامات، والعناية التجميلية.",
+      "ophthalmology": "صحة العين، فحوصات النظر، ووصفات النظارات الطبية.",
+      "gastroenterology": "الجهاز الهضمي، المعدة، الكبد، وصحة البطن."
+    }
   },
   "chatbot": {
     "greeting": "مرحبًا! أنا مساعدك في طبيبي. صف أعراضك، وسأوصي بطبيب متخصص لك.",
@@ -296,6 +321,21 @@
     "viewAll": "عرض الكل",
     "submit": "إرسال",
     "no": "لا",
-    "yes": "نعم"
+    "yes": "نعم",
+    "notAvailable": "غير متاح",
+    "professionalCaregiver": "مقدم رعاية محترف.",
+    "switchLanguage": "التحويل إلى العربية"
+  },
+  "specialities": {
+    "cardiology": "أمراض القلب",
+    "neurology": "الأعصاب",
+    "generalSurgery": "الجراحة العامة",
+    "urology": "المسالك البولية",
+    "orthopedics": "العظام والمفاصل",
+    "dentistry": "طب الأسنان",
+    "ent": "الأذن والأنف والحنجرة",
+    "dermatology": "الأمراض الجلدية",
+    "ophthalmology": "طب العيون",
+    "gastroenterology": "أمراض الجهاز الهضمي"
   }
 }

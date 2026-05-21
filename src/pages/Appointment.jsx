@@ -63,7 +63,7 @@ const CalmingCardBackground = () => {
 };
 
 const Appointment = () => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const { docId } = useParams()
     const { doctors, currencySymbol, patientData, getDoctosData, loadPatientAppointments } = useContext(AppContext)
     const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
@@ -76,7 +76,7 @@ const Appointment = () => {
     // Calming Booking states
     const [isBooking, setIsBooking] = useState(false)
     const [bookingSuccess, setBookingSuccess] = useState(false)
-    const [breatheStage, setBreatheStage] = useState('Inhale peace...')
+    const [breatheStage, setBreatheStage] = useState(t('appointment.inhalePeace'))
 
     const navigate = useNavigate()
 
@@ -312,7 +312,7 @@ const Appointment = () => {
                                     : 'bg-gray-50/50 border border-gray-150 text-gray-500 hover:border-primary hover:bg-white hover:text-primary'
                                 }`}
                             >
-                                <span className='text-[10px] font-extrabold uppercase tracking-wider'>{item[0] && daysOfWeek[item[0].datetime.getDay()]}</span>
+                                <span className='text-[10px] font-extrabold uppercase tracking-wider'>{item[0] && item[0].datetime.toLocaleDateString(i18n.language, { weekday: 'short' }).toUpperCase()}</span>
                                 <span className={`text-xl font-black mt-1.5 ${slotIndex === index ? 'text-white' : 'text-gray-800'}`}>
                                     {item[0] && item[0].datetime.getDate()}
                                 </span>
@@ -387,7 +387,7 @@ const Appointment = () => {
                                     </div>
                                 </div>
 
-                                <div className="text-text-muted text-[10px] tracking-widest uppercase font-bold">Tabibi Calm booking core</div>
+                                <div className="text-text-muted text-[10px] tracking-widest uppercase font-bold">{t('appointment.calmBookingCore')}</div>
                             </>
                         ) : (
                             <div className="animate-fade-in-up flex flex-col items-center gap-6">

@@ -40,7 +40,7 @@ const TopDoctors = () => {
                                     <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white shadow-sm`}>
                                         <span className={`w-1.5 h-1.5 rounded-full ${item.available ? 'bg-green-500' : 'bg-gray-400'}`}></span>
                                         <span className={item.available ? 'text-green-700' : 'text-text-muted'}>
-                                            {item.available ? 'Available' : 'Busy'}
+                                            {item.available ? t('doctors.available') : t('doctors.busy')}
                                         </span>
                                     </span>
                                 </div>

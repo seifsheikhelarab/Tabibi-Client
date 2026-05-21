@@ -20,7 +20,7 @@ const paymentStatusColorMap = {
 };
 
 const MyAppointments = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { patientAppointments, loadPatientAppointments, currencySymbol } = useContext(AppContext);
     const [paymentId, setPaymentId] = useState("");
     const [uploading, setUploading] = useState(false);
@@ -28,11 +28,9 @@ const MyAppointments = () => {
     const [cancellationTarget, setCancellationTarget] = useState(null);
     const [isCancelling, setIsCancelling] = useState(false);
 
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
     const formatDate = (dateStr) => {
         const date = new Date(dateStr);
-        return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+        return date.toLocaleDateString(i18n.language, { day: 'numeric', month: 'short', year: 'numeric' });
     };
 
     const handleCancelRequest = (appointmentId) => {
@@ -186,7 +184,7 @@ const MyAppointments = () => {
                                                         <svg className="w-3.5 h-3.5 text-primary" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                         </svg>
-                                                        {item.startTime || 'N/A'}
+                                                        {item.startTime || t('common.notAvailable')}
                                                     </p>
                                                     <p className="flex items-center gap-1.5 bg-surface-raised px-3 py-1.5 rounded-xl border border-border-light">
                                                         <span className="text-amber font-bold">&#9733;</span>
