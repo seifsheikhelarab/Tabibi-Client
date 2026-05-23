@@ -8,6 +8,7 @@
     "signIn": "تسجيل الدخول",
     "myProfile": "ملفي الشخصي",
     "myAppointments": "مواعيدي",
+    "myChats": "محادثاتي",
     "logout": "تسجيل الخروج",
     "specialistFinder": "الباحث عن الأخصائي"
   },
@@ -124,6 +125,8 @@
     "available": "متاح",
     "busy": "مشغول",
     "resetFilters": "إعادة تعيين الفلاتر",
+    "clearFilters": "مسح",
+    "message": "رسالة",
     "noDoctorsMatch": "لا يوجد أطباء يطابقون الفلاتر المحددة.",
     "yearsExp": "سنوات خبرة",
     "locationNotListed": "الموقع غير مدرج",
@@ -281,6 +284,19 @@
       "ophthalmology": "صحة العين، فحوصات النظر، ووصفات النظارات الطبية.",
       "gastroenterology": "الجهاز الهضمي، المعدة، الكبد، وصحة البطن."
     }
+  },
+  "chat": {
+    "messages": "الرسائل",
+    "chatWithDoctors": "تحدث مع أطبائك",
+    "noConversations": "لا توجد محادثات بعد",
+    "startChatFromProfile": "ابدأ محادثة من ملف الطبيب",
+    "selectConversation": "اختر محادثة",
+    "chooseChatPrompt": "اختر محادثة من اليسار لبدء المراسلة",
+    "noMessagesYet": "لا توجد رسائل بعد. ابدأ المحادثة!",
+    "typeMessage": "اكتب رسالتك...",
+    "deleteConversation": "حذف المحادثة",
+    "deleteConfirm": "هل أنت متأكد من حذف هذه المحادثة؟",
+    "online": "متصل"
   },
   "chatbot": {
     "greeting": "مرحبًا! أنا مساعدك في طبيبي. صف أعراضك، وسأوصي بطبيب متخصص لك.",

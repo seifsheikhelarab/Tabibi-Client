@@ -8,6 +8,7 @@
     "signIn": "Sign In",
     "myProfile": "My Profile",
     "myAppointments": "My Appointments",
+    "myChats": "My Chats",
     "logout": "Logout",
     "specialistFinder": "Specialist Finder"
   },
@@ -124,6 +125,8 @@
     "available": "Available",
     "busy": "Busy",
     "resetFilters": "Reset filters",
+    "clearFilters": "Clear",
+    "message": "Message",
     "noDoctorsMatch": "No doctors match the selected filters.",
     "yearsExp": "Years Exp.",
     "locationNotListed": "Location not listed",
@@ -281,6 +284,19 @@
       "ophthalmology": "Eye health, vision checkups, and optical prescriptions.",
       "gastroenterology": "Digestive tract, stomach, liver, and abdominal health."
     }
+  },
+  "chat": {
+    "messages": "Messages",
+    "chatWithDoctors": "Chat with your doctors",
+    "noConversations": "No conversations yet",
+    "startChatFromProfile": "Start a chat from a doctor's profile",
+    "selectConversation": "Select a conversation",
+    "chooseChatPrompt": "Choose a chat from the left to start messaging",
+    "noMessagesYet": "No messages yet. Start the conversation!",
+    "typeMessage": "Type your message...",
+    "deleteConversation": "Delete conversation",
+    "deleteConfirm": "Are you sure you want to delete this conversation?",
+    "online": "Online"
   },
   "chatbot": {
     "greeting": "Hello! I am your Tabibi assistant. Describe your symptoms, and I will recommend a specialist for you.",

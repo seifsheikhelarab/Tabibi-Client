@@ -1,6 +1,8 @@
 import React from 'react'
+import { AppContext } from './context/AppContext'
 import Navbar from './components/Navbar'
 import { Routes, Route, useNavigate } from 'react-router-dom'
+import { SocketProvider } from './context/SocketContext'
 import Home from './pages/Home'
 import Doctors from './pages/Doctors'
 import Login from './pages/Login'
@@ -16,17 +18,20 @@ import 'react-toastify/dist/ReactToastify.css';
 import Verify from './pages/Verify'
 import Chatbot from './components/Chatbot.jsx'
 import Collaborations from './pages/Collaborations.jsx'
+import Chat from './pages/Chat.jsx'
 import ProtectedRoute from './components/ProtectedRoute'
 import { setNavigate } from './api/client'
 
 const App = () => {
   const navigate = useNavigate()
+  const { session } = React.useContext(AppContext)
 
   React.useEffect(() => {
     setNavigate(navigate)
   }, [navigate])
   return (
     <div className='min-h-screen bg-surface text-text'>
+      <SocketProvider userId={session?.user?.id} userType="user">
       <ToastContainer />
       <Navbar />
       <main className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
@@ -49,10 +54,17 @@ const App = () => {
           <Route path='/my-profile' element={
             <ProtectedRoute><MyProfile /></ProtectedRoute>
           } />
+          <Route path='/chat' element={
+            <ProtectedRoute><Chat /></ProtectedRoute>
+          } />
+          <Route path='/chat/:docId' element={
+            <ProtectedRoute><Chat /></ProtectedRoute>
+          } />
         </Routes>
       </main>
       <Footer />
       <Chatbot />
+      </SocketProvider>
     </div>
   )
 }
